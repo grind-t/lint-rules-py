@@ -1,0 +1,89 @@
+[project]
+name = "grind-t-lint-rules"
+version = "0.1.0"
+description = "Custom lint rules for Python projects"
+license = "ISC"
+authors = [
+    { name = "grind-t", email = "grindt.gd@gmail.com" }
+]
+requires-python = ">=3.14"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/grind-t/lint-rules-py"
+Issues = "https://github.com/grind-t/lint-rules-py/issues"
+
+[project.scripts]
+lint-rules = "lint_rules._wiring.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "lint_rules"
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "I", "UP", "B", "SIM", "RUF", "PT", "N",
+    "C4", "PIE", "PERF", "FURB", "PTH", "T20", "ANN", "ASYNC", "DTZ",
+]
+ignore = ["RUF001"]  # allow Cyrillic in strings
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib", "--strict-markers", "--strict-config", "-ra"]
+xfail_strict = true
+filterwarnings = ["error"]
+
+[tool.poe.tasks]
+fmt = "ruff format"
+lint = [
+    { cmd = "ruff check" },
+    { cmd = "lint-imports" },
+    { cmd = "lint-rules src" },
+]
+typecheck = "ty check"
+test-unit = "pytest tests/core tests/usecases"
+test-integration = "pytest tests --ignore=tests/core --ignore=tests/usecases"
+test = "pytest"
+build = "uv build"
+check = ["lint", "typecheck", "test-unit"]
+
+[dependency-groups]
+dev = [
+    "import-linter",
+    "poethepoet",
+    "pytest",
+    "ruff",
+    "ty",
+]
+
+# ---------- Architecture rules enforced by lint-imports ----------
+[tool.importlinter]
+root_package = "lint_rules"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Layers: dependencies point inward only"
+type = "layers"
+layers = [
+    "lint_rules._wiring",
+    "lint_rules._adapters | lint_rules._usecases",
+    "lint_rules._ports",
+    "lint_rules._core",
+]
+
+[[tool.importlinter.contracts]]
+name = "Core, ports and use cases do no I/O"
+type = "forbidden"
+source_modules = ["lint_rules._core", "lint_rules._ports", "lint_rules._usecases"]
+# also add adapters' third-party dependencies here (httpx, etc.)
+forbidden_modules = ["os", "io", "pathlib", "socket", "subprocess"]
