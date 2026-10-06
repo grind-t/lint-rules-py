@@ -144,6 +144,46 @@ def test_import_above_root_counts_by_name():
     assert unused(files) == []
 
 
+@pytest.mark.parametrize(
+    "usage",
+    [
+        "def _run(c):\n    c.helper()\n_run(a)",
+        "def _run(*, c=a):\n    c.helper()",
+        "(lambda c: c.helper())(a)",
+        "def _run():\n    c = a\n    c.helper()",
+        "def _run():\n    c.helper()\n    c = a",
+        "def _run():\n    for c in [a]:\n        c.helper()",
+        "def _run():\n    with nullcontext(a) as c:\n        c.helper()",
+        "def _run():\n    try: ...\n    except Exception as c:\n        c.helper()",
+        "def _run(x):\n    match x:\n        case [*c]:\n            c.helper()",
+        "[c.helper() for c in [a]]",
+        "def _run():\n    def c(): ...\n    c.helper()",
+        "def _run(c):\n    def inner():\n        c.helper()",
+    ],
+)
+def test_import_shadowed_by_local_name_counts_by_name(usage):
+    files = {
+        "a.py": "def helper(): ...",
+        "c.py": "",
+        "b.py": f"import a\nimport c\n\n{usage}",
+    }
+    assert unused(files) == []
+
+
+@pytest.mark.parametrize(
+    "usage",
+    [
+        "def _run(c): ...\nc.helper()",
+        "def _run(xs):\n    [c for c in xs]\n    c.helper()",
+        "def _run():\n    global c\n    c.helper()",
+        "def _run():\n    import c\n    c.helper()",
+    ],
+)
+def test_local_name_does_not_shadow_import_outside_its_scope(usage):
+    files = {"a.py": "def helper(): ...", "c.py": "", "b.py": f"import c\n{usage}"}
+    assert unused(files) == [("a.py", "helper", 1)]
+
+
 # Known false negatives: an attribute of an object of unknown type counts by
 # its bare name, so it hides any function with the same name.
 
@@ -156,8 +196,9 @@ def test_known_false_negative_same_name_as_attribute():
     assert unused(files) == []
 
 
-# Known false positives: dynamic access is invisible, and imports are resolved
-# without scopes. Such modules need the marker.
+# Known false positives: dynamic access is invisible, and rebinding an import
+# counts only inside functions, lambdas and comprehensions. Such modules need
+# the marker.
 
 
 def test_known_false_positive_getattr_by_string():
@@ -165,10 +206,10 @@ def test_known_false_positive_getattr_by_string():
     assert unused(files) == [("a.py", "helper", 1)]
 
 
-def test_known_false_positive_import_shadowed_by_local_name():
+def test_known_false_positive_import_rebound_at_module_level():
     files = {
         "a.py": "def helper(): ...",
         "c.py": "",
-        "b.py": "import c\n\ndef _run(c):\n    return c.helper()",
+        "b.py": "import a\nimport c\n\nc = a\nc.helper()",
     }
     assert unused(files) == [("a.py", "helper", 1)]
