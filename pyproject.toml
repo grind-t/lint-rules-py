@@ -36,6 +36,7 @@ ignore = ["RUF001"]  # allow Cyrillic in strings
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN"]
+"benchmarks/**" = ["ANN"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -54,6 +55,7 @@ typecheck = "ty check"
 test-unit = "pytest tests/core tests/usecases"
 test-integration = "pytest tests --ignore=tests/core --ignore=tests/usecases"
 test = "pytest"
+bench = "pytest benchmarks --codspeed"
 build = "uv build"
 check = ["lint", "typecheck", "test-unit"]
 
@@ -62,6 +64,7 @@ dev = [
     "import-linter",
     "poethepoet",
     "pytest",
+    "pytest-codspeed",
     "ruff",
     "ty",
 ]
