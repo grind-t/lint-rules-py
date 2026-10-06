@@ -1,3 +1,5 @@
+import ast
+
 import pytest
 
 from lint_rules._core.public_classes import public_classes
@@ -18,4 +20,4 @@ from lint_rules._core.public_classes import public_classes
     ],
 )
 def test_public_classes(source, expected):
-    assert public_classes(source) == expected
+    assert public_classes(ast.parse(source)) == expected

@@ -1,3 +1,5 @@
+import ast
+
 import pytest
 
 from lint_rules._core.single_method_classes import single_method_classes
@@ -27,4 +29,32 @@ from lint_rules._core.single_method_classes import single_method_classes
     ],
 )
 def test_single_method_classes(source, expected):
-    assert single_method_classes(source) == expected
+    assert single_method_classes(ast.parse(source)) == expected
+
+
+def test_finds_classes_in_every_block_in_line_order():
+    source = """\
+class A:
+    def run(self): ...
+if x:
+    class B:
+        def run(self): ...
+else:
+    class C:
+        def run(self): ...
+try:
+    class D:
+        def run(self): ...
+except E:
+    class F:
+        def run(self): ...
+finally:
+    class G:
+        def run(self): ...
+match x:
+    case 1:
+        class H:
+            def run(self): ...
+"""
+    classes = [cls for cls, _, _ in single_method_classes(ast.parse(source))]
+    assert classes == ["A", "B", "C", "D", "F", "G", "H"]

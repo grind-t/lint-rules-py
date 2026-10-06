@@ -1,24 +1,19 @@
-from collections.abc import Iterable
+import ast
 
 from lint_rules._core.public_classes import public_classes
 from lint_rules._core.violation import Violation
-from lint_rules._ports.source_files import ReadSourceFiles
 
 MARKER = "# allow-multiple-public-classes"
 
 
-def check_public_classes(
-    read_files: ReadSourceFiles, roots: Iterable[str]
-) -> list[Violation]:
-    violations = []
-    for path, source in read_files(roots):
-        if MARKER in source:
-            continue
-        classes = public_classes(source)
-        if len(classes) > 1:
-            message = (
-                f"{len(classes)} public classes ({', '.join(classes)}); "
-                "split them into separate modules"
-            )
-            violations.append(Violation(path, message))
-    return violations
+def check_public_classes(path: str, source: str, tree: ast.Module) -> list[Violation]:
+    if MARKER in source:
+        return []
+    classes = public_classes(tree)
+    if len(classes) <= 1:
+        return []
+    message = (
+        f"{len(classes)} public classes ({', '.join(classes)}); "
+        "split them into separate modules"
+    )
+    return [Violation(path, message)]

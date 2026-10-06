@@ -13,11 +13,11 @@ def _is_exempt(cls: ast.ClassDef, exempt: set[str]) -> bool:
     )
 
 
-def public_classes(source: str) -> list[str]:
+def public_classes(tree: ast.Module) -> list[str]:
     """Public top-level classes of a module, excluding exceptions and enums."""
     exempt: set[str] = set()
     found: list[str] = []
-    for node in ast.parse(source).body:
+    for node in tree.body:
         if not isinstance(node, ast.ClassDef):
             continue
         if _is_exempt(node, exempt):
