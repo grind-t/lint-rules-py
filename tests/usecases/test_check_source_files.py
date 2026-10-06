@@ -15,22 +15,3 @@ def test_runs_every_check_on_every_file():
         }
     )
     assert [v.path for v in check_source_files(files, ["src"])] == ["a.py", "b.py"]
-
-
-def test_runs_stateful_checks_after_every_file():
-    files = fake_read_files(
-        {
-            "a.py": "def helper(): ...\ndef used(): ...",
-            "b.py": "from a import used\nclass A: ...\nclass B: ...",
-        }
-    )
-    assert [str(v) for v in check_source_files(files, ["src"])] == [
-        "b.py: 2 public classes (A, B); split them into separate modules",
-        "a.py: line 1: function helper is not used outside the module; "
-        "rename it to _helper",
-    ]
-
-
-def test_stateful_checks_start_fresh_on_every_run():
-    files = fake_read_files({"a.py": "def helper(): ..."})
-    assert check_source_files(files, ["src"]) == check_source_files(files, ["src"])

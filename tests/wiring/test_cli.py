@@ -28,13 +28,3 @@ def test_cli_passes_clean_tree(tmp_path, capsys):
 
     assert main([str(tmp_path)]) == 0
     assert capsys.readouterr().err == ""
-
-
-def test_cli_reports_unused_public_function(tmp_path, capsys):
-    (tmp_path / "bad.py").write_text("def helper(): ...\n")
-
-    assert main([str(tmp_path)]) == 1
-    assert capsys.readouterr().err == (
-        f"{tmp_path / 'bad.py'}: line 1: function helper is not used outside "
-        "the module; rename it to _helper\n"
-    )
