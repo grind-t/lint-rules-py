@@ -85,17 +85,67 @@ def test_sorts_by_path_and_line():
     assert unused(files) == [("a.py", "h", 1), ("b.py", "g", 1), ("b.py", "f", 2)]
 
 
-# Known false negatives: names are matched without resolving modules, so
-# another module's import or attribute with the same name hides the function.
-
-
-def test_known_false_negative_same_name_imported_from_elsewhere():
+def test_same_name_imported_from_another_module_does_not_count():
     files = {
         "a.py": "def helper(): ...\nhelper()",
         "b.py": "from c import helper",
         "c.py": "def helper(): ...",
     }
-    assert ("a.py", "helper", 1) not in unused(files)
+    assert unused(files) == [("a.py", "helper", 1)]
+
+
+def test_same_name_imported_from_outside_does_not_count():
+    files = {"a.py": "def find(): ...", "b.py": "from ctypes.util import find"}
+    assert unused(files) == [("a.py", "find", 1)]
+
+
+def test_same_name_attribute_of_other_module_does_not_count():
+    files = {
+        "pkg/a.py": "def helper(): ...",
+        "pkg/c.py": "",
+        "b.py": "import pkg.c\npkg.c.helper()",
+    }
+    assert unused(files) == [("pkg/a.py", "helper", 1)]
+
+
+@pytest.mark.parametrize(
+    "usage",
+    [
+        "from pkg import a\na.helper()",
+        "from ..pkg import a\na.helper()",
+        "import pkg.a\npkg.a.helper()",
+    ],
+)
+def test_attribute_resolved_through_import(usage):
+    files = {"pkg/a.py": "def helper(): ...", "other/b.py": usage}
+    assert unused(files) == []
+
+
+@pytest.mark.parametrize(
+    "usage",
+    [
+        # A module re-exported under another name is not a file.
+        "import pkg\npkg.api.helper()",
+        # Neither is an object that forwards attributes to a module.
+        "from pkg.registry import proxy\nproxy.helper()",
+    ],
+)
+def test_attribute_of_unknown_module_counts_by_name(usage):
+    files = {
+        "pkg/__init__.py": "from . import impl as api",
+        "pkg/impl.py": "def helper(): ...",
+        "b.py": usage,
+    }
+    assert unused(files) == []
+
+
+def test_import_above_root_counts_by_name():
+    files = {"a.py": "def helper(): ...", "pkg/b.py": "from ...x import helper"}
+    assert unused(files) == []
+
+
+# Known false negatives: an attribute of an object of unknown type counts by
+# its bare name, so it hides any function with the same name.
 
 
 def test_known_false_negative_same_name_as_attribute():
@@ -106,7 +156,19 @@ def test_known_false_negative_same_name_as_attribute():
     assert unused(files) == []
 
 
+# Known false positives: dynamic access is invisible, and imports are resolved
+# without scopes. Such modules need the marker.
+
+
 def test_known_false_positive_getattr_by_string():
-    # Dynamic access is invisible; such modules need the marker.
     files = {"a.py": "def helper(): ...", "b.py": "import a\ngetattr(a, 'helper')"}
+    assert unused(files) == [("a.py", "helper", 1)]
+
+
+def test_known_false_positive_import_shadowed_by_local_name():
+    files = {
+        "a.py": "def helper(): ...",
+        "c.py": "",
+        "b.py": "import c\n\ndef _run(c):\n    return c.helper()",
+    }
     assert unused(files) == [("a.py", "helper", 1)]
