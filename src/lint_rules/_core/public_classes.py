@@ -2,14 +2,15 @@ import ast
 
 from lint_rules._core.bases import base_name
 
-ENUM_BASES = {"Enum", "IntEnum", "StrEnum", "Flag", "IntFlag"}
-EXCEPTION_SUFFIXES = ("Error", "Exception", "Warning")
+_ENUM_BASES = {"Enum", "IntEnum", "StrEnum", "Flag", "IntFlag"}
+_EXCEPTION_SUFFIXES = ("Error", "Exception", "Warning")
 
 
 def _is_exempt(cls: ast.ClassDef, exempt: set[str]) -> bool:
     names = [base_name(base) for base in cls.bases]
     return any(
-        n in ENUM_BASES or n in exempt or n.endswith(EXCEPTION_SUFFIXES) for n in names
+        n in _ENUM_BASES or n in exempt or n.endswith(_EXCEPTION_SUFFIXES)
+        for n in names
     )
 
 

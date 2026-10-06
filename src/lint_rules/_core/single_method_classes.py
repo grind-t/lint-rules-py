@@ -3,9 +3,9 @@ from collections.abc import Iterator
 
 from lint_rules._core.bases import base_name
 
-FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
-BLOCK_FIELDS = ("body", "orelse", "finalbody", "handlers", "cases")
-BLOCK_TYPES = (ast.stmt, ast.excepthandler, ast.match_case)
+_FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
+_BLOCK_FIELDS = ("body", "orelse", "finalbody", "handlers", "cases")
+_BLOCK_TYPES = (ast.stmt, ast.excepthandler, ast.match_case)
 
 
 def _statements(tree: ast.Module) -> Iterator[ast.AST]:
@@ -18,10 +18,12 @@ def _statements(tree: ast.Module) -> Iterator[ast.AST]:
     while stack:
         node = stack.pop()
         yield node
-        for field in BLOCK_FIELDS:
+        for field in _BLOCK_FIELDS:
             block = getattr(node, field, None)
             if isinstance(block, list):
-                stack.extend(child for child in block if isinstance(child, BLOCK_TYPES))
+                stack.extend(
+                    child for child in block if isinstance(child, _BLOCK_TYPES)
+                )
 
 
 def _is_filler(stmt: ast.stmt) -> bool:
@@ -40,7 +42,7 @@ def _single_method(cls: ast.ClassDef) -> str | None:
         return None
     methods: list[str] = []
     for stmt in cls.body:
-        if isinstance(stmt, FUNCTION_TYPES):
+        if isinstance(stmt, _FUNCTION_TYPES):
             methods.append(stmt.name)
         elif not _is_filler(stmt):
             return None

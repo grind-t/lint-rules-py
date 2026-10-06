@@ -8,8 +8,8 @@ from lint_rules._usecases.check_public_classes import check_public_classes
 from lint_rules._usecases.check_single_method_classes import (
     check_single_method_classes,
 )
-from lint_rules._usecases.check_unused_public_functions import (
-    CheckUnusedPublicFunctions,
+from lint_rules._usecases.check_unused_public_names import (
+    CheckUnusedPublicNames,
 )
 
 type Check = Callable[[str, str, ast.Module], list[Violation]]
@@ -23,21 +23,21 @@ class StatefulCheck(Protocol):
     def finish(self) -> list[Violation]: ...
 
 
-CHECKS: tuple[Check, ...] = (check_public_classes, check_single_method_classes)
+_CHECKS: tuple[Check, ...] = (check_public_classes, check_single_method_classes)
 
 # Factories, not instances: every run starts with fresh state.
-STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (CheckUnusedPublicFunctions,)
+_STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (CheckUnusedPublicNames,)
 
 
 def check_source_files(
     read_files: ReadSourceFiles, roots: Iterable[str]
 ) -> list[Violation]:
     """Run every check on each file, parsing it only once."""
-    stateful = [make() for make in STATEFUL_CHECKS]
+    stateful = [make() for make in _STATEFUL_CHECKS]
     violations = []
     for path, source in read_files(roots):
         tree = ast.parse(source)
-        for check in CHECKS:
+        for check in _CHECKS:
             violations.extend(check(path, source, tree))
         for check in stateful:
             check.visit(path, source, tree)

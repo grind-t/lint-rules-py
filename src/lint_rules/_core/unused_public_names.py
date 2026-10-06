@@ -4,11 +4,13 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from importlib.util import resolve_name
 
+from lint_rules._core.candidate import Candidate, Kind
+
 # Not an identifier, so no module name can clash with it.
-ROOT = "<root>"
-FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
-NAMED_BINDING_TYPES = (
-    *FUNCTION_TYPES,
+_ROOT = "<root>"
+_FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
+_NAMED_BINDING_TYPES = (
+    *_FUNCTION_TYPES,
     ast.ClassDef,
     ast.ExceptHandler,
     ast.MatchAs,
@@ -16,10 +18,10 @@ NAMED_BINDING_TYPES = (
 )
 # AST classes are never subclassed, so hot loops look up the exact type rather
 # than check ``isinstance`` against each one.
-BINDING_KINDS = frozenset({ast.arg, ast.Name, ast.MatchMapping, *NAMED_BINDING_TYPES})
-SCOPE_KINDS = frozenset(
+_BINDING_KINDS = frozenset({ast.arg, ast.Name, ast.MatchMapping, *_NAMED_BINDING_TYPES})
+_SCOPE_KINDS = frozenset(
     {
-        *FUNCTION_TYPES,
+        *_FUNCTION_TYPES,
         ast.Lambda,
         ast.ListComp,
         ast.SetComp,
@@ -31,14 +33,14 @@ SCOPE_KINDS = frozenset(
 
 @dataclass(frozen=True)
 class ModuleSummary:
-    """What a module defines and uses, enough to judge its functions later.
+    """What a module defines and uses, enough to judge its names later.
 
-    Usages are kept as qualified names (``module.function``) where the module
-    is known from an import, and as bare names where it is not.
+    Usages are kept as qualified names (``module.name``) where the module is
+    known from an import, and as bare names where it is not.
     """
 
     path: str
-    candidates: tuple[tuple[str, int], ...]
+    candidates: tuple[Candidate, ...]
     imported: frozenset[str]
     referenced: frozenset[str]
     attributes: frozenset[str]
@@ -66,27 +68,51 @@ def _declared_all(tree: ast.Module) -> set[str]:
     return names
 
 
-def _is_dunder(name: str) -> bool:
-    return name.startswith("__") and name.endswith("__")
+def _assigned_names(target: ast.expr) -> list[str]:
+    """Names an assignment target binds: ``a``, ``a, *b`` or ``[a, (b, c)]``."""
+    if isinstance(target, ast.Name):
+        return [target.id]
+    if isinstance(target, ast.Starred):
+        return _assigned_names(target.value)
+    if isinstance(target, ast.Tuple | ast.List):
+        return [name for elt in target.elts for name in _assigned_names(elt)]
+    return []
 
 
-def _candidates(path: str, tree: ast.Module) -> tuple[tuple[str, int], ...]:
-    """Public top-level functions that are not exempt from the rule.
+def _definitions(node: ast.stmt) -> list[tuple[Kind, str]]:
+    """Functions and variables a top-level statement defines.
 
-    Exempt are functions of ``__init__.py``, dunders, names in ``__all__`` and
-    decorated functions, which frameworks call without naming them.
+    Decorated functions are left out, as frameworks call them without naming
+    them. So are annotations without a value, which bind nothing.
+    """
+    if isinstance(node, _FUNCTION_TYPES):
+        return [] if node.decorator_list else [("function", node.name)]
+    if isinstance(node, ast.Assign):
+        targets = node.targets
+    elif isinstance(node, ast.AnnAssign) and node.value:
+        targets = [node.target]
+    else:
+        return []
+    return [("variable", name) for t in targets for name in _assigned_names(t)]
+
+
+def _candidates(path: str, tree: ast.Module) -> tuple[Candidate, ...]:
+    """Public top-level functions and variables not exempt from the rule.
+
+    Exempt are names of ``__init__.py``, private names (dunders among them)
+    and names in ``__all__``. A name defined twice is judged by its first
+    definition.
     """
     if path.replace("\\", "/").endswith("/__init__.py") or path == "__init__.py":
         return ()
-    exported = _declared_all(tree)
-    return tuple(
-        (node.name, node.lineno)
-        for node in tree.body
-        if isinstance(node, FUNCTION_TYPES)
-        and not node.name.startswith("_")
-        and not node.decorator_list
-        and node.name not in exported
-    )
+    seen = _declared_all(tree)
+    candidates = []
+    for node in tree.body:
+        for kind, name in _definitions(node):
+            if not name.startswith("_") and name not in seen:
+                candidates.append(Candidate(kind, name, node.lineno))
+            seen.add(name)
+    return tuple(candidates)
 
 
 def _package(path: str) -> list[str]:
@@ -103,10 +129,10 @@ def _absolute_module(package: list[str], node: ast.ImportFrom) -> str | None:
     """
     name = "." * node.level + (node.module or "")
     try:
-        module = resolve_name(name, ".".join([ROOT, *package]))
+        module = resolve_name(name, ".".join([_ROOT, *package]))
     except ImportError:
         return None
-    return module.removeprefix(ROOT).removeprefix(".") or None
+    return module.removeprefix(_ROOT).removeprefix(".") or None
 
 
 def _chain(node: ast.Attribute) -> list[str] | None:
@@ -131,14 +157,14 @@ def _root(node: ast.Attribute) -> str | None:
 
 
 def _bound_name(node: ast.AST) -> str | None:
-    """Name that ``node`` of ``BINDING_KINDS`` binds, if any (imports aside)."""
+    """Name that ``node`` of ``_BINDING_KINDS`` binds, if any (imports aside)."""
     if isinstance(node, ast.Name):
         return node.id if isinstance(node.ctx, ast.Store | ast.Del) else None
     if isinstance(node, ast.arg):
         return node.arg
     if isinstance(node, ast.MatchMapping):
         return node.rest
-    if isinstance(node, NAMED_BINDING_TYPES):
+    if isinstance(node, _NAMED_BINDING_TYPES):
         return node.name
     return None
 
@@ -175,11 +201,11 @@ def _shadowed_attributes(tree: ast.Module, names: set[str]) -> set[ast.Attribute
             root = _root(node)
             if root in names:
                 scope.attributes.append((node, root))
-        elif type(node) in BINDING_KINDS:
+        elif type(node) in _BINDING_KINDS:
             scope.bound.add(_bound_name(node))
         elif isinstance(node, ast.Global | ast.Nonlocal):
             scope.declared.update(node.names)
-        if type(node) in SCOPE_KINDS:
+        if type(node) in _SCOPE_KINDS:
             scope = _Scope(scope)
             scopes.append(scope)
         stack.extend([(child, scope) for child in ast.iter_child_nodes(node)])
@@ -193,11 +219,11 @@ def _shadowed_attributes(tree: ast.Module, names: set[str]) -> set[ast.Attribute
 
 
 def summarize_module(path: str, tree: ast.Module) -> ModuleSummary:
-    """Candidates of a module and the functions it can reach in other modules.
+    """Candidates of a module and the names it can reach in other modules.
 
-    A function of another module is reachable either through an import
+    A name of another module is reachable either through an import
     (``from a import f``) or an attribute (``a.f``); bare names are ignored
-    because they can only refer to another module's function after an import.
+    because they can only refer to another module's name after an import.
     Attributes are resolved through the module's imports, unless a function,
     lambda or comprehension rebinds the name; the rest (``obj.f``) keep only
     the bare name.
@@ -233,7 +259,7 @@ def summarize_module(path: str, tree: ast.Module) -> ModuleSummary:
                 else:
                     imported.add(f"{module}.{alias.name}")
                     aliases[alias.asname or alias.name] = f"{module}.{alias.name}"
-        elif type(node) in BINDING_KINDS:
+        elif type(node) in _BINDING_KINDS:
             bound.add(_bound_name(node))
     # Rebinding an import is rare, so scopes are only walked when it happens.
     rebound = {
@@ -279,15 +305,15 @@ def _module_tails(paths: Iterable[str]) -> set[str]:
     return tails
 
 
-def unused_public_functions(
+def unused_public_names(
     summaries: Iterable[ModuleSummary],
-) -> list[tuple[str, str, int]]:
-    """``(path, function, line)`` for public functions no other module uses.
+) -> list[tuple[str, Candidate]]:
+    """``(path, candidate)`` for public names no other module uses.
 
     An attribute resolved to a module that is not among the files (``a.b.f``
     where ``a.b`` is a class, an object or a module re-exported under another
-    name) may still reach a function, so it counts by bare name. An imported
-    name does not: ``from os import f`` never reaches a function of ours.
+    name) may still reach a name of ours, so it counts by bare name. An
+    imported name does not: ``from os import f`` never reaches a name of ours.
     """
     summaries = list(summaries)
     tails = _module_tails(s.path for s in summaries)
@@ -308,12 +334,12 @@ def unused_public_functions(
         if any(_matches_module(path, m) for m in star_imports):
             continue
         found.extend(
-            (path, name, line)
-            for name, line in summary.candidates
-            if not bare[name] - {path}
+            (path, c)
+            for c in summary.candidates
+            if not bare[c.name] - {path}
             and not any(
                 user != path and _matches_module(path, module)
-                for module, user in qualified[name]
+                for module, user in qualified[c.name]
             )
         )
-    return sorted(found, key=lambda item: (item[0], item[2]))
+    return sorted(found, key=lambda item: (item[0], item[1].line))

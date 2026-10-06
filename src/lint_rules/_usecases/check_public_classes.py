@@ -3,11 +3,11 @@ import ast
 from lint_rules._core.public_classes import public_classes
 from lint_rules._core.violation import Violation
 
-MARKER = "# allow-multiple-public-classes"
+_MARKER = "# allow-multiple-public-classes"
 
 
 def check_public_classes(path: str, source: str, tree: ast.Module) -> list[Violation]:
-    if MARKER in source:
+    if _MARKER in source:
         return []
     classes = public_classes(tree)
     if len(classes) <= 1:

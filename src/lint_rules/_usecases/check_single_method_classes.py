@@ -3,13 +3,13 @@ import ast
 from lint_rules._core.single_method_classes import single_method_classes
 from lint_rules._core.violation import Violation
 
-MARKER = "# allow-single-method-classes"
+_MARKER = "# allow-single-method-classes"
 
 
 def check_single_method_classes(
     path: str, source: str, tree: ast.Module
 ) -> list[Violation]:
-    if MARKER in source:
+    if _MARKER in source:
         return []
     return [
         Violation(

@@ -2,16 +2,20 @@ import ast
 
 import pytest
 
-from lint_rules._core.unused_public_functions import (
+from lint_rules._core.candidate import Kind
+from lint_rules._core.unused_public_names import (
     summarize_module,
-    unused_public_functions,
+    unused_public_names,
 )
 
 
-def unused(files: dict[str, str]) -> list[tuple[str, str, int]]:
-    return unused_public_functions(
+def unused(
+    files: dict[str, str], kind: Kind = "function"
+) -> list[tuple[str, str, int]]:
+    found = unused_public_names(
         summarize_module(path, ast.parse(source)) for path, source in files.items()
     )
+    return [(path, c.name, c.line) for path, c in found if c.kind == kind]
 
 
 def test_reports_function_used_only_inside_its_module():
@@ -213,3 +217,66 @@ def test_known_false_positive_import_rebound_at_module_level():
         "b.py": "import a\nimport c\n\nc = a\nc.helper()",
     }
     assert unused(files) == [("a.py", "helper", 1)]
+
+
+def test_reports_variable_used_only_inside_its_module():
+    files = {"a.py": "def helper(): ...\nLIMIT = 1\nhelper(LIMIT)"}
+    assert unused(files, "variable") == [("a.py", "LIMIT", 2)]
+
+
+@pytest.mark.parametrize(
+    ("source", "names"),
+    [
+        ("a, *b = c", ["a", "b"]),
+        ("[a, (b, c)] = d", ["a", "b", "c"]),
+        ("a = b = 1", ["a", "b"]),
+        ("a: int = 1", ["a"]),
+    ],
+)
+def test_reports_every_assigned_variable(source, names):
+    assert unused({"m.py": source}, "variable") == [("m.py", n, 1) for n in names]
+
+
+@pytest.mark.parametrize(
+    "usage",
+    [
+        "from a import LIMIT",
+        "from .a import LIMIT as L",
+        "import a\nprint(a.LIMIT)",
+        "import a\na.LIMIT = 2",
+    ],
+)
+def test_passes_variable_used_by_another_module(usage):
+    assert unused({"a.py": "LIMIT = 1", "b.py": usage}, "variable") == []
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "_limit = 1",
+        "__version__ = '1.0'",
+        "__all__ = ['LIMIT']\nLIMIT = 1",
+        "LIMIT: int",
+        "def f():\n    limit = 1",
+        "class A:\n    LIMIT = 1",
+        "if x:\n    LIMIT = 1",
+        "type Alias = int",
+    ],
+)
+def test_ignores_exempt_and_non_top_level_variables(source):
+    assert unused({"a.py": source}, "variable") == []
+
+
+def test_augmented_assignment_does_not_define_variable():
+    files = {"a.py": "LIMIT = 0\nLIMIT += 1"}
+    assert unused(files, "variable") == [("a.py", "LIMIT", 1)]
+
+
+def test_name_defined_twice_is_reported_once():
+    files = {"a.py": "LIMIT = 1\nLIMIT = 2\ndef LIMIT(): ..."}
+    assert unused(files, "variable") == [("a.py", "LIMIT", 1)]
+    assert unused(files, "function") == []
+
+
+def test_variables_of_init_are_exempt():
+    assert unused({"pkg/__init__.py": "LIMIT = 1"}, "variable") == []
