@@ -2,7 +2,10 @@ import ast
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from importlib.util import resolve_name
 
+# Not an identifier, so no module name can clash with it.
+ROOT = "<root>"
 FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
 NAMED_BINDING_TYPES = (
     *FUNCTION_TYPES,
@@ -93,15 +96,17 @@ def _package(path: str) -> list[str]:
 
 
 def _absolute_module(package: list[str], node: ast.ImportFrom) -> str | None:
-    """Module of ``from ... import``, or ``None`` if it climbs above the root."""
-    if node.level == 0:
-        return node.module
-    if node.level - 1 > len(package):
+    """Module of ``from ... import``, or ``None`` if it climbs above the root.
+
+    ``resolve_name`` stops at the top package, while imports here may climb
+    to the directory the paths start from, so it gets that as a package too.
+    """
+    name = "." * node.level + (node.module or "")
+    try:
+        module = resolve_name(name, ".".join([ROOT, *package]))
+    except ImportError:
         return None
-    parts = package[: len(package) - (node.level - 1)]
-    if node.module:
-        parts.append(node.module)
-    return ".".join(parts) or None
+    return module.removeprefix(ROOT).removeprefix(".") or None
 
 
 def _chain(node: ast.Attribute) -> list[str] | None:
