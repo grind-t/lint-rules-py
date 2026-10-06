@@ -13,6 +13,16 @@ def test_cli_fails_on_violation(tmp_path, capsys):
     )
 
 
+def test_cli_reports_single_method_class(tmp_path, capsys):
+    (tmp_path / "bad.py").write_text("class A:\n    def run(self): ...\n")
+
+    assert main([str(tmp_path)]) == 1
+    assert capsys.readouterr().err == (
+        f"{tmp_path / 'bad.py'}: line 1: class A has a single method run; "
+        "use a function, a Callable alias or a Protocol with __call__\n"
+    )
+
+
 def test_cli_passes_clean_tree(tmp_path, capsys):
     (tmp_path / "ok.py").write_text("class A: ...\n")
 
