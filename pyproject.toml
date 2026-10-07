@@ -40,6 +40,7 @@ ignore = ["RUF001"]  # allow Cyrillic in strings
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["tests/usecases"]
 addopts = ["--import-mode=importlib", "--strict-markers", "--strict-config", "-ra"]
 xfail_strict = true
 filterwarnings = ["error"]
