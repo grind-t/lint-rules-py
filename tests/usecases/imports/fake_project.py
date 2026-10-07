@@ -47,19 +47,12 @@ class Project:
         return name.replace(".", "/") + ".py"
 
 
-def check(project: Project) -> list[str]:
-    """Violations of the checked file as "LINE:COL: message", or "message" when
-    they have no location; other files only give context."""
+def check(project: Project) -> list[Violation]:
+    """Violations of the checked file; other files only give context."""
     assert project.checked_path, "the project has no checked file"
     violations = check_source_files(lambda _roots: project.files.items(), ["src"])
-    return [_render(v) for v in violations if v.path == project.checked_path]
+    return [v for v in violations if v.path == project.checked_path]
 
 
-def _render(violation: Violation) -> str:
-    if (location := violation.location) is None:
-        return violation.message
-    return f"{location.line}:{location.col}: {violation.message}"
-
-
-def case(description: str, project: Project, *, expected: list[str]):
+def case(description: str, project: Project, *, expected: list[Violation]):
     return pytest.param(project, expected, id=description)

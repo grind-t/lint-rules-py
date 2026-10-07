@@ -1,6 +1,9 @@
 import pytest
 from fake_project import Project, case, check
 
+from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.violation import Violation
+
 
 @pytest.mark.parametrize(
     ("project", "expected"),
@@ -13,8 +16,12 @@ from fake_project import Project, case, check
             .module("lib._core.greeting")
             .check_module("lib.app", "from lib._core.greeting import *"),
             expected=[
-                '1:32: "from lib._core.greeting import *" hides which names '
-                "are used; import them explicitly"
+                Violation(
+                    "src/lib/app.py",
+                    '"from lib._core.greeting import *" hides which names '
+                    "are used; import them explicitly",
+                    SourceLocation(1, 32),
+                )
             ],
         ),
         case(

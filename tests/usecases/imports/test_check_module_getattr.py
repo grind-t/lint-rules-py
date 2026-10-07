@@ -1,6 +1,8 @@
 import pytest
 from fake_project import Project, case, check
 
+from lint_rules._core.violation import Violation
+
 
 @pytest.mark.parametrize(
     ("project", "expected"),
@@ -9,14 +11,22 @@ from fake_project import Project, case, check
             "reports def __getattr__",
             Project().check_module("app", "def __getattr__(name): ..."),
             expected=[
-                "module-level __getattr__ makes names dynamic; define them explicitly"
+                Violation(
+                    "src/app.py",
+                    "module-level __getattr__ makes names dynamic; "
+                    "define them explicitly",
+                )
             ],
         ),
         case(
             "reports __getattr__ assignment",
             Project().check_module("app", "__getattr__ = _lazy"),
             expected=[
-                "module-level __getattr__ makes names dynamic; define them explicitly"
+                Violation(
+                    "src/app.py",
+                    "module-level __getattr__ makes names dynamic; "
+                    "define them explicitly",
+                )
             ],
         ),
         # lib._lazy does not exist, so only the binding is reported.
@@ -26,7 +36,11 @@ from fake_project import Project, case, check
             .package("lib")
             .check_module("lib.app", "from lib._lazy import __getattr__"),
             expected=[
-                "module-level __getattr__ makes names dynamic; define them explicitly"
+                Violation(
+                    "src/lib/app.py",
+                    "module-level __getattr__ makes names dynamic; "
+                    "define them explicitly",
+                )
             ],
         ),
         case(
@@ -39,7 +53,11 @@ from fake_project import Project, case, check
                 """,
             ),
             expected=[
-                "module-level __getattr__ makes names dynamic; define them explicitly"
+                Violation(
+                    "src/app.py",
+                    "module-level __getattr__ makes names dynamic; "
+                    "define them explicitly",
+                )
             ],
         ),
         case(

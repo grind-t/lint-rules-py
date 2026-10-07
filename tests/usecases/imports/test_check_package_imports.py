@@ -1,6 +1,9 @@
 import pytest
 from fake_project import Project, case, check
 
+from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.violation import Violation
+
 
 @pytest.mark.parametrize(
     ("project", "expected"),
@@ -22,8 +25,12 @@ from fake_project import Project, case, check
             .module("lib._core.greeting")
             .check_module("lib.app", "from lib._core import greeting"),
             expected=[
-                "1:23: lib._core.greeting is a module; "
-                "import names from it instead of the module itself"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core.greeting is a module; "
+                    "import names from it instead of the module itself",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         case(
@@ -33,8 +40,12 @@ from fake_project import Project, case, check
             .package("lib._core")
             .check_module("lib.app", "from lib import _core"),
             expected=[
-                "1:17: lib._core is a module; "
-                "import names from it instead of the module itself"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core is a module; "
+                    "import names from it instead of the module itself",
+                    SourceLocation(1, 17),
+                )
             ],
         ),
         case(
@@ -45,8 +56,12 @@ from fake_project import Project, case, check
             .module("lib._core.greeting", "def format_greeting(): ...")
             .check_module("lib.app", "from lib._core import format_greeting"),
             expected=[
-                "1:23: lib._core is a package; "
-                "import format_greeting from lib._core.greeting"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core is a package; "
+                    "import format_greeting from lib._core.greeting",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         case(
@@ -65,10 +80,18 @@ from fake_project import Project, case, check
                 """,
             ),
             expected=[
-                "2:5: lib._core is a package; "
-                "import format_greeting from lib._core.greeting",
-                "3:5: lib._core.greeting is a module; "
-                "import names from it instead of the module itself",
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core is a package; "
+                    "import format_greeting from lib._core.greeting",
+                    SourceLocation(2, 5),
+                ),
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core.greeting is a module; "
+                    "import names from it instead of the module itself",
+                    SourceLocation(3, 5),
+                ),
             ],
         ),
         # A definition in __init__.py does not make importing from a package fine.
@@ -79,8 +102,12 @@ from fake_project import Project, case, check
             .package("lib._core", 'DEFAULT_NAME = "world"')
             .check_module("lib.app", "from lib._core import DEFAULT_NAME"),
             expected=[
-                "1:23: lib._core is a package; "
-                "move DEFAULT_NAME from its __init__.py to a module"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core is a package; "
+                    "move DEFAULT_NAME from its __init__.py to a module",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         # At runtime the result depends on whether the submodule is already imported.
@@ -92,8 +119,12 @@ from fake_project import Project, case, check
             .module("lib._core.greeting")
             .check_module("lib.app", "from lib._core import greeting"),
             expected=[
-                "1:23: lib._core.greeting is a module; "
-                "import names from it instead of the module itself"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core.greeting is a module; "
+                    "import names from it instead of the module itself",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         # lib._extra has no __init__.py.
@@ -104,8 +135,12 @@ from fake_project import Project, case, check
             .module("lib._extra.plugin")
             .check_module("lib.app", "from lib._extra import plugin"),
             expected=[
-                "1:24: lib._extra.plugin is a module; "
-                "import names from it instead of the module itself"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._extra.plugin is a module; "
+                    "import names from it instead of the module itself",
+                    SourceLocation(1, 24),
+                )
             ],
         ),
         case(
@@ -115,8 +150,12 @@ from fake_project import Project, case, check
             .module("lib._extra.plugin", "def run(): ...")
             .check_module("lib.app", "from lib._extra import run"),
             expected=[
-                "1:24: lib._extra is a package; "
-                "import run from the module that defines it"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._extra is a package; "
+                    "import run from the module that defines it",
+                    SourceLocation(1, 24),
+                )
             ],
         ),
         # A package is rejected whatever the name; the missing name is ty's job.
@@ -127,8 +166,12 @@ from fake_project import Project, case, check
             .package("lib._core")
             .check_module("lib.app", "from lib._core import missing"),
             expected=[
-                "1:23: lib._core is a package; "
-                "import missing from the module that defines it"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core is a package; "
+                    "import missing from the module that defines it",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         # The root package is a package too, and a way into an import cycle.
@@ -139,7 +182,13 @@ from fake_project import Project, case, check
             .package("lib._wiring")
             .module("lib._wiring.greet", "def greet(): ...")
             .check_module("lib.app", "from lib import greet"),
-            expected=["1:17: lib is a package; import greet from lib._wiring.greet"],
+            expected=[
+                Violation(
+                    "src/lib/app.py",
+                    "lib is a package; import greet from lib._wiring.greet",
+                    SourceLocation(1, 17),
+                )
+            ],
         ),
         case(
             "reports package that shadows module with same name",
@@ -150,8 +199,12 @@ from fake_project import Project, case, check
             .package("lib._core.greeting")
             .check_module("lib.app", "from lib._core.greeting import format_greeting"),
             expected=[
-                "1:32: lib._core.greeting is a package; "
-                "import format_greeting from the module that defines it"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core.greeting is a package; "
+                    "import format_greeting from the module that defines it",
+                    SourceLocation(1, 32),
+                )
             ],
         ),
         case(
@@ -168,8 +221,12 @@ from fake_project import Project, case, check
                 """,
             ),
             expected=[
-                "2:27: lib._core.greeting is a module; "
-                "import names from it instead of the module itself"
+                Violation(
+                    "src/lib/app.py",
+                    "lib._core.greeting is a module; "
+                    "import names from it instead of the module itself",
+                    SourceLocation(2, 27),
+                )
             ],
         ),
         case(

@@ -1,6 +1,9 @@
 import pytest
 from fake_project import Project, case, check
 
+from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.violation import Violation
+
 
 @pytest.mark.parametrize(
     ("project", "expected"),
@@ -12,8 +15,12 @@ from fake_project import Project, case, check
             .module("lib.greeting", "from lib.name_source import NameSource")
             .check_module("lib.app", "from lib.greeting import NameSource"),
             expected=[
-                "1:26: NameSource is not defined in lib.greeting, "
-                "only imported there; import NameSource from lib.name_source"
+                Violation(
+                    "src/lib/app.py",
+                    "NameSource is not defined in lib.greeting, "
+                    "only imported there; import NameSource from lib.name_source",
+                    SourceLocation(1, 26),
+                )
             ],
         ),
         # An annotation without a value binds nothing; the ImportError is ty's job.
@@ -131,8 +138,12 @@ from fake_project import Project, case, check
             )
             .check_module("lib.app", "from lib.names import nullcontext"),
             expected=[
-                "1:23: nullcontext is not defined in lib.names, "
-                "only imported there; import nullcontext from contextlib"
+                Violation(
+                    "src/lib/app.py",
+                    "nullcontext is not defined in lib.names, "
+                    "only imported there; import nullcontext from contextlib",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         case(
@@ -142,8 +153,12 @@ from fake_project import Project, case, check
             .module("lib.names", "from contextlib import suppress as quiet")
             .check_module("lib.app", "from lib.names import quiet"),
             expected=[
-                "1:23: quiet is not defined in lib.names, "
-                "only imported there; import suppress from contextlib"
+                Violation(
+                    "src/lib/app.py",
+                    "quiet is not defined in lib.names, "
+                    "only imported there; import suppress from contextlib",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         case(
@@ -153,8 +168,12 @@ from fake_project import Project, case, check
             .module("lib.names", "import sys")
             .check_module("lib.app", "from lib.names import sys"),
             expected=[
-                "1:23: sys is not defined in lib.names, "
-                "only imported there as module sys"
+                Violation(
+                    "src/lib/app.py",
+                    "sys is not defined in lib.names, "
+                    "only imported there as module sys",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         # "import os.path" binds os.
@@ -165,7 +184,11 @@ from fake_project import Project, case, check
             .module("lib.names", "import os.path")
             .check_module("lib.app", "from lib.names import os"),
             expected=[
-                "1:23: os is not defined in lib.names, only imported there as module os"
+                Violation(
+                    "src/lib/app.py",
+                    "os is not defined in lib.names, only imported there as module os",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         case(
@@ -175,8 +198,12 @@ from fake_project import Project, case, check
             .module("lib.names", "import os.path as osp")
             .check_module("lib.app", "from lib.names import osp"),
             expected=[
-                "1:23: osp is not defined in lib.names, "
-                "only imported there as module os.path"
+                Violation(
+                    "src/lib/app.py",
+                    "osp is not defined in lib.names, "
+                    "only imported there as module os.path",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
         case(
@@ -186,8 +213,12 @@ from fake_project import Project, case, check
             .module("lib.names", "from .greet import greet")
             .check_module("lib.app", "from lib.names import greet"),
             expected=[
-                "1:23: greet is not defined in lib.names, "
-                "only imported there; import it from the module that defines it"
+                Violation(
+                    "src/lib/app.py",
+                    "greet is not defined in lib.names, "
+                    "only imported there; import it from the module that defines it",
+                    SourceLocation(1, 23),
+                )
             ],
         ),
     ],

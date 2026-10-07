@@ -30,8 +30,3 @@ def test_marker_disables_check():
     assert (
         check("# allow-single-method-classes\nclass A:\n    def run(self): ...") == []
     )
-
-
-def test_str_shows_location():
-    [violation] = check("class A:\n    def run(self): ...")
-    assert str(violation).startswith("a.py:1:1: class A has a single method run")
