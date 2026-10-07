@@ -30,9 +30,12 @@ module-name = "lint_rules"
 [tool.ruff.lint]
 select = [
     "E", "F", "I", "UP", "B", "SIM", "RUF", "PT", "N",
-    "C4", "PIE", "PERF", "FURB", "PTH", "T20", "ANN", "ASYNC", "DTZ",
+    "C4", "PIE", "PERF", "FURB", "PTH", "T20", "ANN", "ASYNC", "DTZ", "TID",
 ]
 ignore = ["RUF001"]  # allow Cyrillic in strings
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN"]

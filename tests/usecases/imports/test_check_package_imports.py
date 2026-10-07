@@ -252,6 +252,29 @@ from lint_rules._core.violations.name_in_package_init import NameInPackageInitVi
             .check_module("lib.app", "from lib._core.missing import x"),
             expected=[],
         ),
+        # Relative imports are ruff's job (TID252); as absolute ones both names
+        # would be reported.
+        case(
+            "passes relative import",
+            Project()
+            .package("lib")
+            .package("lib._core")
+            .module("lib._core.greeting")
+            .package("lib._usecases")
+            .check_module(
+                "lib._usecases.app", "from .._core import greeting, format_greeting"
+            ),
+            expected=[],
+        ),
+        # Star imports are ruff's job (F403).
+        case(
+            "passes star import",
+            Project()
+            .package("lib")
+            .package("lib._core")
+            .check_module("lib.app", "from lib._core import *"),
+            expected=[],
+        ),
     ],
 )
 def test_from_package_or_submodule(project, expected):
