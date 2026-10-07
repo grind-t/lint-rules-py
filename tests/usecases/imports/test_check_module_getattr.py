@@ -1,7 +1,7 @@
 import pytest
 from fake_project import Project, case, check
 
-from lint_rules._core.violation import Violation
+from lint_rules._core.violations.module_getattr import ModuleGetattrViolation
 
 
 @pytest.mark.parametrize(
@@ -10,24 +10,12 @@ from lint_rules._core.violation import Violation
         case(
             "reports def __getattr__",
             Project().check_module("app", "def __getattr__(name): ..."),
-            expected=[
-                Violation(
-                    "src/app.py",
-                    "module-level __getattr__ makes names dynamic; "
-                    "define them explicitly",
-                )
-            ],
+            expected=[ModuleGetattrViolation("src/app.py")],
         ),
         case(
             "reports __getattr__ assignment",
             Project().check_module("app", "__getattr__ = _lazy"),
-            expected=[
-                Violation(
-                    "src/app.py",
-                    "module-level __getattr__ makes names dynamic; "
-                    "define them explicitly",
-                )
-            ],
+            expected=[ModuleGetattrViolation("src/app.py")],
         ),
         # lib._lazy does not exist, so only the binding is reported.
         case(
@@ -35,13 +23,7 @@ from lint_rules._core.violation import Violation
             Project()
             .package("lib")
             .check_module("lib.app", "from lib._lazy import __getattr__"),
-            expected=[
-                Violation(
-                    "src/lib/app.py",
-                    "module-level __getattr__ makes names dynamic; "
-                    "define them explicitly",
-                )
-            ],
+            expected=[ModuleGetattrViolation("src/lib/app.py")],
         ),
         case(
             "reports __getattr__ in top-level block",
@@ -52,13 +34,7 @@ from lint_rules._core.violation import Violation
                     def __getattr__(name): ...
                 """,
             ),
-            expected=[
-                Violation(
-                    "src/app.py",
-                    "module-level __getattr__ makes names dynamic; "
-                    "define them explicitly",
-                )
-            ],
+            expected=[ModuleGetattrViolation("src/app.py")],
         ),
         case(
             "passes __getattr__ method",

@@ -4,7 +4,9 @@ import pytest
 from fake_project import Project, case, check
 
 from lint_rules._core.source_location import SourceLocation
-from lint_rules._core.violation import Violation
+from lint_rules._core.violations.module_getattr import ModuleGetattrViolation
+from lint_rules._core.violations.relative_import import RelativeImportViolation
+from lint_rules._core.violations.star_import import StarImportViolation
 
 
 @pytest.mark.parametrize(
@@ -23,10 +25,10 @@ from lint_rules._core.violation import Violation
                 "lib._usecases.app", "from .._core import greeting, format_greeting"
             ),
             expected=[
-                Violation(
+                RelativeImportViolation(
                     "src/lib/_usecases/app.py",
-                    'relative import; use "from lib._core import ..." instead',
                     SourceLocation(1, 1),
+                    absolute="lib._core",
                 )
             ],
         ),
@@ -37,10 +39,10 @@ from lint_rules._core.violation import Violation
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from .._core import *"),
             expected=[
-                Violation(
+                RelativeImportViolation(
                     "src/lib/_usecases/app.py",
-                    'relative import; use "from lib._core import ..." instead',
                     SourceLocation(1, 1),
+                    absolute="lib._core",
                 )
             ],
         ),
@@ -51,16 +53,12 @@ from lint_rules._core.violation import Violation
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from .lazy import __getattr__"),
             expected=[
-                Violation(
+                RelativeImportViolation(
                     "src/lib/_usecases/app.py",
-                    'relative import; use "from lib._usecases.lazy import ..." instead',
                     SourceLocation(1, 1),
+                    absolute="lib._usecases.lazy",
                 ),
-                Violation(
-                    "src/lib/_usecases/app.py",
-                    "module-level __getattr__ makes names dynamic; "
-                    "define them explicitly",
-                ),
+                ModuleGetattrViolation("src/lib/_usecases/app.py"),
             ],
         ),
         # The star import is reported instead of the package: one violation, not two.
@@ -71,11 +69,8 @@ from lint_rules._core.violation import Violation
             .package("lib._core")
             .check_module("lib.app", "from lib._core import *"),
             expected=[
-                Violation(
-                    "src/lib/app.py",
-                    '"from lib._core import *" hides which names are used; '
-                    "import them explicitly",
-                    SourceLocation(1, 23),
+                StarImportViolation(
+                    "src/lib/app.py", SourceLocation(1, 23), module="lib._core"
                 )
             ],
         ),

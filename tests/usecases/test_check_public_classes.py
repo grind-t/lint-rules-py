@@ -1,5 +1,8 @@
 from lint_rules._core.parsed_file import ParsedFile
 from lint_rules._core.violation import Violation
+from lint_rules._core.violations.multiple_public_classes import (
+    MultiplePublicClassesViolation,
+)
 from lint_rules._usecases.check_public_classes import check_public_classes
 
 
@@ -9,7 +12,7 @@ def check(source: str) -> list[Violation]:
 
 def test_reports_module_with_two_public_classes():
     assert check("class A: ...\nclass B: ...") == [
-        Violation("a.py", "2 public classes (A, B); split them into separate modules")
+        MultiplePublicClassesViolation("a.py", classes=("A", "B"))
     ]
 
 

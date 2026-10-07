@@ -2,7 +2,7 @@ import pytest
 from fake_project import Project, case, check
 
 from lint_rules._core.source_location import SourceLocation
-from lint_rules._core.violation import Violation
+from lint_rules._core.violations.relative_import import RelativeImportViolation
 
 
 @pytest.mark.parametrize(
@@ -17,10 +17,10 @@ from lint_rules._core.violation import Violation
                 "lib._usecases.app", "from .._core.greeting import format_greeting"
             ),
             expected=[
-                Violation(
+                RelativeImportViolation(
                     "src/lib/_usecases/app.py",
-                    'relative import; use "from lib._core.greeting import ..." instead',
                     SourceLocation(1, 1),
+                    absolute="lib._core.greeting",
                 )
             ],
         ),
@@ -31,10 +31,10 @@ from lint_rules._core.violation import Violation
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from . import greet"),
             expected=[
-                Violation(
+                RelativeImportViolation(
                     "src/lib/_usecases/app.py",
-                    'relative import; use "from lib._usecases import ..." instead',
                     SourceLocation(1, 1),
+                    absolute="lib._usecases",
                 )
             ],
         ),
@@ -45,10 +45,8 @@ from lint_rules._core.violation import Violation
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from ... import x"),
             expected=[
-                Violation(
-                    "src/lib/_usecases/app.py",
-                    "relative import; use an absolute import instead",
-                    SourceLocation(1, 1),
+                RelativeImportViolation(
+                    "src/lib/_usecases/app.py", SourceLocation(1, 1), absolute=None
                 )
             ],
         ),
@@ -58,10 +56,10 @@ from lint_rules._core.violation import Violation
             .package("lib")
             .check_package("lib._core", "from .greeting import format_greeting"),
             expected=[
-                Violation(
+                RelativeImportViolation(
                     "src/lib/_core/__init__.py",
-                    'relative import; use "from lib._core.greeting import ..." instead',
                     SourceLocation(1, 1),
+                    absolute="lib._core.greeting",
                 )
             ],
         ),
@@ -70,10 +68,8 @@ from lint_rules._core.violation import Violation
             "checks file without module name",
             Project().package("lib").check_file("my-dir/x.py", "from . import x"),
             expected=[
-                Violation(
-                    "src/my-dir/x.py",
-                    "relative import; use an absolute import instead",
-                    SourceLocation(1, 1),
+                RelativeImportViolation(
+                    "src/my-dir/x.py", SourceLocation(1, 1), absolute=None
                 )
             ],
         ),

@@ -2,7 +2,9 @@ import pytest
 from fake_project import Project, case, check
 
 from lint_rules._core.source_location import SourceLocation
-from lint_rules._core.violation import Violation
+from lint_rules._core.violations.first_party_module_import import (
+    FirstPartyModuleImportViolation,
+)
 from lint_rules._usecases.check_source_files import check_source_files
 
 
@@ -13,12 +15,8 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports root package",
             Project().package("lib").check_module("lib.app", "import lib"),
             expected=[
-                Violation(
-                    "src/lib/app.py",
-                    '"import lib" '
-                    "binds a first-party module; "
-                    'use "from <module> import <name>" instead',
-                    SourceLocation(1, 8),
+                FirstPartyModuleImportViolation(
+                    "src/lib/app.py", SourceLocation(1, 8), module="lib"
                 )
             ],
         ),
@@ -30,12 +28,8 @@ from lint_rules._usecases.check_source_files import check_source_files
             .module("lib._core.greeting")
             .check_module("lib.app", "import lib._core.greeting as greeting"),
             expected=[
-                Violation(
-                    "src/lib/app.py",
-                    '"import lib._core.greeting" '
-                    "binds a first-party module; "
-                    'use "from <module> import <name>" instead',
-                    SourceLocation(1, 8),
+                FirstPartyModuleImportViolation(
+                    "src/lib/app.py", SourceLocation(1, 8), module="lib._core.greeting"
                 )
             ],
         ),
@@ -47,12 +41,8 @@ from lint_rules._usecases.check_source_files import check_source_files
             .module("lib._core.greeting")
             .check_module("lib.app", "import os, lib._core.greeting"),
             expected=[
-                Violation(
-                    "src/lib/app.py",
-                    '"import lib._core.greeting" '
-                    "binds a first-party module; "
-                    'use "from <module> import <name>" instead',
-                    SourceLocation(1, 12),
+                FirstPartyModuleImportViolation(
+                    "src/lib/app.py", SourceLocation(1, 12), module="lib._core.greeting"
                 )
             ],
         ),
@@ -61,12 +51,8 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports nonexistent first-party module",
             Project().package("lib").check_module("lib.app", "import lib._nope"),
             expected=[
-                Violation(
-                    "src/lib/app.py",
-                    '"import lib._nope" '
-                    "binds a first-party module; "
-                    'use "from <module> import <name>" instead',
-                    SourceLocation(1, 8),
+                FirstPartyModuleImportViolation(
+                    "src/lib/app.py", SourceLocation(1, 8), module="lib._nope"
                 )
             ],
         ),
@@ -74,12 +60,8 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports top-level module",
             Project().module("single").check_module("app", "import single"),
             expected=[
-                Violation(
-                    "src/app.py",
-                    '"import single" '
-                    "binds a first-party module; "
-                    'use "from <module> import <name>" instead',
-                    SourceLocation(1, 8),
+                FirstPartyModuleImportViolation(
+                    "src/app.py", SourceLocation(1, 8), module="single"
                 )
             ],
         ),
@@ -95,12 +77,8 @@ from lint_rules._usecases.check_source_files import check_source_files
                 """,
             ),
             expected=[
-                Violation(
-                    "src/lib/app.py",
-                    '"import lib._core.greeting" '
-                    "binds a first-party module; "
-                    'use "from <module> import <name>" instead',
-                    SourceLocation(2, 12),
+                FirstPartyModuleImportViolation(
+                    "src/lib/app.py", SourceLocation(2, 12), module="lib._core.greeting"
                 )
             ],
         ),
@@ -109,12 +87,8 @@ from lint_rules._usecases.check_source_files import check_source_files
             "checks file without module name",
             Project().package("lib").check_file("my-dir/x.py", "import lib"),
             expected=[
-                Violation(
-                    "src/my-dir/x.py",
-                    '"import lib" '
-                    "binds a first-party module; "
-                    'use "from <module> import <name>" instead',
-                    SourceLocation(1, 8),
+                FirstPartyModuleImportViolation(
+                    "src/my-dir/x.py", SourceLocation(1, 8), module="lib"
                 )
             ],
         ),
@@ -156,10 +130,5 @@ def test_import_of_first_party_module(project, expected):
 def test_current_directory_as_root():
     files = {"lib/__init__.py": "", "lib/x.py": "import lib"}
     assert check_source_files(lambda _roots: files.items(), ["."]) == [
-        Violation(
-            "lib/x.py",
-            '"import lib" binds a first-party module; '
-            'use "from <module> import <name>" instead',
-            SourceLocation(1, 8),
-        )
+        FirstPartyModuleImportViolation("lib/x.py", SourceLocation(1, 8), module="lib")
     ]

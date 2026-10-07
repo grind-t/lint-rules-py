@@ -2,7 +2,8 @@ import pytest
 from fake_project import Project, case, check
 
 from lint_rules._core.source_location import SourceLocation
-from lint_rules._core.violation import Violation
+from lint_rules._core.violations.reexported_module import ReexportedModuleViolation
+from lint_rules._core.violations.reexported_name import ReexportedNameViolation
 
 
 @pytest.mark.parametrize(
@@ -15,11 +16,13 @@ from lint_rules._core.violation import Violation
             .module("lib.greeting", "from lib.name_source import NameSource")
             .check_module("lib.app", "from lib.greeting import NameSource"),
             expected=[
-                Violation(
+                ReexportedNameViolation(
                     "src/lib/app.py",
-                    "NameSource is not defined in lib.greeting, "
-                    "only imported there; import NameSource from lib.name_source",
                     SourceLocation(1, 26),
+                    name="NameSource",
+                    module="lib.greeting",
+                    source="lib.name_source",
+                    source_name="NameSource",
                 )
             ],
         ),
@@ -138,11 +141,13 @@ from lint_rules._core.violation import Violation
             )
             .check_module("lib.app", "from lib.names import nullcontext"),
             expected=[
-                Violation(
+                ReexportedNameViolation(
                     "src/lib/app.py",
-                    "nullcontext is not defined in lib.names, "
-                    "only imported there; import nullcontext from contextlib",
                     SourceLocation(1, 23),
+                    name="nullcontext",
+                    module="lib.names",
+                    source="contextlib",
+                    source_name="nullcontext",
                 )
             ],
         ),
@@ -153,11 +158,13 @@ from lint_rules._core.violation import Violation
             .module("lib.names", "from contextlib import suppress as quiet")
             .check_module("lib.app", "from lib.names import quiet"),
             expected=[
-                Violation(
+                ReexportedNameViolation(
                     "src/lib/app.py",
-                    "quiet is not defined in lib.names, "
-                    "only imported there; import suppress from contextlib",
                     SourceLocation(1, 23),
+                    name="quiet",
+                    module="lib.names",
+                    source="contextlib",
+                    source_name="suppress",
                 )
             ],
         ),
@@ -168,11 +175,12 @@ from lint_rules._core.violation import Violation
             .module("lib.names", "import sys")
             .check_module("lib.app", "from lib.names import sys"),
             expected=[
-                Violation(
+                ReexportedModuleViolation(
                     "src/lib/app.py",
-                    "sys is not defined in lib.names, "
-                    "only imported there as module sys",
                     SourceLocation(1, 23),
+                    name="sys",
+                    module="lib.names",
+                    imported="sys",
                 )
             ],
         ),
@@ -184,10 +192,12 @@ from lint_rules._core.violation import Violation
             .module("lib.names", "import os.path")
             .check_module("lib.app", "from lib.names import os"),
             expected=[
-                Violation(
+                ReexportedModuleViolation(
                     "src/lib/app.py",
-                    "os is not defined in lib.names, only imported there as module os",
                     SourceLocation(1, 23),
+                    name="os",
+                    module="lib.names",
+                    imported="os",
                 )
             ],
         ),
@@ -198,11 +208,12 @@ from lint_rules._core.violation import Violation
             .module("lib.names", "import os.path as osp")
             .check_module("lib.app", "from lib.names import osp"),
             expected=[
-                Violation(
+                ReexportedModuleViolation(
                     "src/lib/app.py",
-                    "osp is not defined in lib.names, "
-                    "only imported there as module os.path",
                     SourceLocation(1, 23),
+                    name="osp",
+                    module="lib.names",
+                    imported="os.path",
                 )
             ],
         ),
@@ -213,11 +224,13 @@ from lint_rules._core.violation import Violation
             .module("lib.names", "from .greet import greet")
             .check_module("lib.app", "from lib.names import greet"),
             expected=[
-                Violation(
+                ReexportedNameViolation(
                     "src/lib/app.py",
-                    "greet is not defined in lib.names, "
-                    "only imported there; import it from the module that defines it",
                     SourceLocation(1, 23),
+                    name="greet",
+                    module="lib.names",
+                    source=None,
+                    source_name="greet",
                 )
             ],
         ),
