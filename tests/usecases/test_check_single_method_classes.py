@@ -1,5 +1,6 @@
 import ast
 
+from lint_rules._core.source_location import SourceLocation
 from lint_rules._core.violation import Violation
 from lint_rules._usecases.check_single_method_classes import (
     check_single_method_classes,
@@ -14,8 +15,9 @@ def test_reports_class_with_single_method():
     assert check("x = 1\n\nclass A:\n    def run(self): ...") == [
         Violation(
             "a.py",
-            "line 3: class A has a single method run; "
+            "class A has a single method run; "
             "use a function, a Callable alias or a Protocol with __call__",
+            SourceLocation(3, 1),
         )
     ]
 
@@ -28,3 +30,8 @@ def test_marker_disables_check():
     assert (
         check("# allow-single-method-classes\nclass A:\n    def run(self): ...") == []
     )
+
+
+def test_str_shows_location():
+    [violation] = check("class A:\n    def run(self): ...")
+    assert str(violation).startswith("a.py:1:1: class A has a single method run")

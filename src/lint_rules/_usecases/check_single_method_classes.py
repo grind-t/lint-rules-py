@@ -14,8 +14,9 @@ def check_single_method_classes(
     return [
         Violation(
             path,
-            f"line {line}: class {cls} has a single method {method}; "
+            f"class {cls} has a single method {method}; "
             "use a function, a Callable alias or a Protocol with __call__",
+            location,
         )
-        for cls, method, line in single_method_classes(tree)
+        for cls, method, location in single_method_classes(tree)
     ]

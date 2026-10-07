@@ -11,7 +11,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports root package",
             Project().package("lib").check_module("lib.app", "import lib"),
             expected=[
-                'line 1, col 8: "import lib" '
+                '1:8: "import lib" '
                 'binds a first-party module; use "from <module> import <name>" instead'
             ],
         ),
@@ -23,7 +23,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             .module("lib._core.greeting")
             .check_module("lib.app", "import lib._core.greeting as greeting"),
             expected=[
-                'line 1, col 8: "import lib._core.greeting" '
+                '1:8: "import lib._core.greeting" '
                 'binds a first-party module; use "from <module> import <name>" instead'
             ],
         ),
@@ -35,7 +35,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             .module("lib._core.greeting")
             .check_module("lib.app", "import os, lib._core.greeting"),
             expected=[
-                'line 1, col 12: "import lib._core.greeting" '
+                '1:12: "import lib._core.greeting" '
                 'binds a first-party module; use "from <module> import <name>" instead'
             ],
         ),
@@ -44,7 +44,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports nonexistent first-party module",
             Project().package("lib").check_module("lib.app", "import lib._nope"),
             expected=[
-                'line 1, col 8: "import lib._nope" '
+                '1:8: "import lib._nope" '
                 'binds a first-party module; use "from <module> import <name>" instead'
             ],
         ),
@@ -52,7 +52,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports top-level module",
             Project().module("single").check_module("app", "import single"),
             expected=[
-                'line 1, col 8: "import single" '
+                '1:8: "import single" '
                 'binds a first-party module; use "from <module> import <name>" instead'
             ],
         ),
@@ -68,7 +68,7 @@ from lint_rules._usecases.check_source_files import check_source_files
                 """,
             ),
             expected=[
-                'line 2, col 12: "import lib._core.greeting" '
+                '2:12: "import lib._core.greeting" '
                 'binds a first-party module; use "from <module> import <name>" instead'
             ],
         ),
@@ -77,7 +77,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "checks file without module name",
             Project().package("lib").check_file("my-dir/x.py", "import lib"),
             expected=[
-                'line 1, col 8: "import lib" '
+                '1:8: "import lib" '
                 'binds a first-party module; use "from <module> import <name>" instead'
             ],
         ),
@@ -120,10 +120,7 @@ def test_current_directory_as_root():
     files = {"lib/__init__.py": "", "lib/x.py": "import lib"}
     violations = check_source_files(lambda _roots: files.items(), ["."])
 
-    assert [(v.path, v.message) for v in violations] == [
-        (
-            "lib/x.py",
-            'line 1, col 8: "import lib" '
-            'binds a first-party module; use "from <module> import <name>" instead',
-        )
+    assert [str(v) for v in violations] == [
+        'lib/x.py:1:8: "import lib" '
+        'binds a first-party module; use "from <module> import <name>" instead'
     ]

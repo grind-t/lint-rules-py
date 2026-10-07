@@ -13,7 +13,7 @@ from fake_project import Project, case, check
             .module("lib._core.greeting")
             .check_module("lib.app", "from lib._core.greeting import *"),
             expected=[
-                'line 1, col 32: "from lib._core.greeting import *" hides which names '
+                '1:32: "from lib._core.greeting import *" hides which names '
                 "are used; import them explicitly"
             ],
         ),

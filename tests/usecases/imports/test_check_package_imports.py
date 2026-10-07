@@ -22,7 +22,7 @@ from fake_project import Project, case, check
             .module("lib._core.greeting")
             .check_module("lib.app", "from lib._core import greeting"),
             expected=[
-                "line 1, col 23: lib._core.greeting is a module; "
+                "1:23: lib._core.greeting is a module; "
                 "import names from it instead of the module itself"
             ],
         ),
@@ -33,7 +33,7 @@ from fake_project import Project, case, check
             .package("lib._core")
             .check_module("lib.app", "from lib import _core"),
             expected=[
-                "line 1, col 17: lib._core is a module; "
+                "1:17: lib._core is a module; "
                 "import names from it instead of the module itself"
             ],
         ),
@@ -45,7 +45,7 @@ from fake_project import Project, case, check
             .module("lib._core.greeting", "def format_greeting(): ...")
             .check_module("lib.app", "from lib._core import format_greeting"),
             expected=[
-                "line 1, col 23: lib._core is a package; "
+                "1:23: lib._core is a package; "
                 "import format_greeting from lib._core.greeting"
             ],
         ),
@@ -65,9 +65,9 @@ from fake_project import Project, case, check
                 """,
             ),
             expected=[
-                "line 2, col 5: lib._core is a package; "
+                "2:5: lib._core is a package; "
                 "import format_greeting from lib._core.greeting",
-                "line 3, col 5: lib._core.greeting is a module; "
+                "3:5: lib._core.greeting is a module; "
                 "import names from it instead of the module itself",
             ],
         ),
@@ -79,7 +79,7 @@ from fake_project import Project, case, check
             .package("lib._core", 'DEFAULT_NAME = "world"')
             .check_module("lib.app", "from lib._core import DEFAULT_NAME"),
             expected=[
-                "line 1, col 23: lib._core is a package; "
+                "1:23: lib._core is a package; "
                 "move DEFAULT_NAME from its __init__.py to a module"
             ],
         ),
@@ -92,7 +92,7 @@ from fake_project import Project, case, check
             .module("lib._core.greeting")
             .check_module("lib.app", "from lib._core import greeting"),
             expected=[
-                "line 1, col 23: lib._core.greeting is a module; "
+                "1:23: lib._core.greeting is a module; "
                 "import names from it instead of the module itself"
             ],
         ),
@@ -104,7 +104,7 @@ from fake_project import Project, case, check
             .module("lib._extra.plugin")
             .check_module("lib.app", "from lib._extra import plugin"),
             expected=[
-                "line 1, col 24: lib._extra.plugin is a module; "
+                "1:24: lib._extra.plugin is a module; "
                 "import names from it instead of the module itself"
             ],
         ),
@@ -115,7 +115,7 @@ from fake_project import Project, case, check
             .module("lib._extra.plugin", "def run(): ...")
             .check_module("lib.app", "from lib._extra import run"),
             expected=[
-                "line 1, col 24: lib._extra is a package; "
+                "1:24: lib._extra is a package; "
                 "import run from the module that defines it"
             ],
         ),
@@ -127,7 +127,7 @@ from fake_project import Project, case, check
             .package("lib._core")
             .check_module("lib.app", "from lib._core import missing"),
             expected=[
-                "line 1, col 23: lib._core is a package; "
+                "1:23: lib._core is a package; "
                 "import missing from the module that defines it"
             ],
         ),
@@ -139,9 +139,7 @@ from fake_project import Project, case, check
             .package("lib._wiring")
             .module("lib._wiring.greet", "def greet(): ...")
             .check_module("lib.app", "from lib import greet"),
-            expected=[
-                "line 1, col 17: lib is a package; import greet from lib._wiring.greet"
-            ],
+            expected=["1:17: lib is a package; import greet from lib._wiring.greet"],
         ),
         case(
             "reports package that shadows module with same name",
@@ -152,7 +150,7 @@ from fake_project import Project, case, check
             .package("lib._core.greeting")
             .check_module("lib.app", "from lib._core.greeting import format_greeting"),
             expected=[
-                "line 1, col 32: lib._core.greeting is a package; "
+                "1:32: lib._core.greeting is a package; "
                 "import format_greeting from the module that defines it"
             ],
         ),
@@ -170,7 +168,7 @@ from fake_project import Project, case, check
                 """,
             ),
             expected=[
-                "line 2, col 27: lib._core.greeting is a module; "
+                "2:27: lib._core.greeting is a module; "
                 "import names from it instead of the module itself"
             ],
         ),

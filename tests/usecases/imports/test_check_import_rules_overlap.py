@@ -19,10 +19,7 @@ from fake_project import Project, case, check
             .check_module(
                 "lib._usecases.app", "from .._core import greeting, format_greeting"
             ),
-            expected=[
-                "line 1, col 1: relative import; "
-                'use "from lib._core import ..." instead'
-            ],
+            expected=['1:1: relative import; use "from lib._core import ..." instead'],
         ),
         case(
             "reports relative star import only as relative",
@@ -30,10 +27,7 @@ from fake_project import Project, case, check
             .package("lib")
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from .._core import *"),
-            expected=[
-                "line 1, col 1: relative import; "
-                'use "from lib._core import ..." instead'
-            ],
+            expected=['1:1: relative import; use "from lib._core import ..." instead'],
         ),
         case(
             "reports __getattr__ binding separately from relative import",
@@ -42,10 +36,9 @@ from fake_project import Project, case, check
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from .lazy import __getattr__"),
             expected=[
-                "line 1, col 1: relative import; "
+                "1:1: relative import; "
                 'use "from lib._usecases.lazy import ..." instead',
-                "line 1, col 19: module-level __getattr__ makes names dynamic; "
-                "define them explicitly",
+                "module-level __getattr__ makes names dynamic; define them explicitly",
             ],
         ),
         # The star import is reported instead of the package: one violation, not two.
@@ -56,7 +49,7 @@ from fake_project import Project, case, check
             .package("lib._core")
             .check_module("lib.app", "from lib._core import *"),
             expected=[
-                'line 1, col 23: "from lib._core import *" hides which names are used; '
+                '1:23: "from lib._core import *" hides which names are used; '
                 "import them explicitly"
             ],
         ),

@@ -2,6 +2,7 @@ import ast
 from collections.abc import Iterator
 
 from lint_rules._core.bases import base_name
+from lint_rules._core.source_location import SourceLocation
 
 _FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
 _BLOCK_FIELDS = ("body", "orelse", "finalbody", "handlers", "cases")
@@ -53,8 +54,8 @@ def _single_method(cls: ast.ClassDef) -> str | None:
     return methods[0]
 
 
-def single_method_classes(tree: ast.Module) -> list[tuple[str, str, int]]:
-    """``(class, method, line)`` for every class that should be a function.
+def single_method_classes(tree: ast.Module) -> list[tuple[str, str, SourceLocation]]:
+    """``(class, method, location)`` for every class that should be a function.
 
     A class qualifies when its body is one method other than ``__init__`` and
     nothing else: no decorators, no base classes other than ``Protocol``,
@@ -62,7 +63,7 @@ def single_method_classes(tree: ast.Module) -> list[tuple[str, str, int]]:
     the recommended replacement and is not reported.
     """
     found = [
-        (node.name, method, node.lineno)
+        (node.name, method, SourceLocation(node.lineno, node.col_offset + 1))
         for node in _statements(tree)
         if isinstance(node, ast.ClassDef) and (method := _single_method(node))
     ]

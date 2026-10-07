@@ -3,20 +3,45 @@ import ast
 import pytest
 
 from lint_rules._core.single_method_classes import single_method_classes
+from lint_rules._core.source_location import SourceLocation
 
 
 @pytest.mark.parametrize(
     ("source", "expected"),
     [
-        ("class A:\n    def run(self): ...", [("A", "run", 1)]),
-        ('class A:\n    """Doc."""\n    def run(self): ...', [("A", "run", 1)]),
-        ("class A:\n    async def run(self): ...", [("A", "run", 1)]),
-        ("class A:\n    @staticmethod\n    def run(): ...", [("A", "run", 1)]),
-        ("class A:\n    def __call__(self): ...", [("A", "__call__", 1)]),
-        ("class P(Protocol):\n    def run(self): ...", [("P", "run", 1)]),
-        ("class P(typing.Protocol[T]):\n    def run(self): ...", [("P", "run", 1)]),
-        ("class _A(object):\n    def run(self): ...", [("_A", "run", 1)]),
-        ("def f():\n    class A:\n        def run(self): ...", [("A", "run", 2)]),
+        ("class A:\n    def run(self): ...", [("A", "run", SourceLocation(1, 1))]),
+        (
+            'class A:\n    """Doc."""\n    def run(self): ...',
+            [("A", "run", SourceLocation(1, 1))],
+        ),
+        (
+            "class A:\n    async def run(self): ...",
+            [("A", "run", SourceLocation(1, 1))],
+        ),
+        (
+            "class A:\n    @staticmethod\n    def run(): ...",
+            [("A", "run", SourceLocation(1, 1))],
+        ),
+        (
+            "class A:\n    def __call__(self): ...",
+            [("A", "__call__", SourceLocation(1, 1))],
+        ),
+        (
+            "class P(Protocol):\n    def run(self): ...",
+            [("P", "run", SourceLocation(1, 1))],
+        ),
+        (
+            "class P(typing.Protocol[T]):\n    def run(self): ...",
+            [("P", "run", SourceLocation(1, 1))],
+        ),
+        (
+            "class _A(object):\n    def run(self): ...",
+            [("_A", "run", SourceLocation(1, 1))],
+        ),
+        (
+            "def f():\n    class A:\n        def run(self): ...",
+            [("A", "run", SourceLocation(2, 5))],
+        ),
         ("class P(Protocol):\n    def __call__(self): ...", []),
         ("class A:\n    def run(self): ...\n    def stop(self): ...", []),
         ("class A:\n    def __init__(self): ...", []),

@@ -9,16 +9,14 @@ from fake_project import Project, case, check
             "reports def __getattr__",
             Project().check_module("app", "def __getattr__(name): ..."),
             expected=[
-                "line 1, col 1: module-level __getattr__ makes names dynamic; "
-                "define them explicitly"
+                "module-level __getattr__ makes names dynamic; define them explicitly"
             ],
         ),
         case(
             "reports __getattr__ assignment",
             Project().check_module("app", "__getattr__ = _lazy"),
             expected=[
-                "line 1, col 1: module-level __getattr__ makes names dynamic; "
-                "define them explicitly"
+                "module-level __getattr__ makes names dynamic; define them explicitly"
             ],
         ),
         # lib._lazy does not exist, so only the binding is reported.
@@ -28,8 +26,7 @@ from fake_project import Project, case, check
             .package("lib")
             .check_module("lib.app", "from lib._lazy import __getattr__"),
             expected=[
-                "line 1, col 23: module-level __getattr__ makes names dynamic; "
-                "define them explicitly"
+                "module-level __getattr__ makes names dynamic; define them explicitly"
             ],
         ),
         case(
@@ -42,8 +39,7 @@ from fake_project import Project, case, check
                 """,
             ),
             expected=[
-                "line 2, col 5: module-level __getattr__ makes names dynamic; "
-                "define them explicitly"
+                "module-level __getattr__ makes names dynamic; define them explicitly"
             ],
         ),
         case(

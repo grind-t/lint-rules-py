@@ -12,7 +12,7 @@ from fake_project import Project, case, check
             .module("lib.greeting", "from lib.name_source import NameSource")
             .check_module("lib.app", "from lib.greeting import NameSource"),
             expected=[
-                "line 1, col 26: NameSource is not defined in lib.greeting, "
+                "1:26: NameSource is not defined in lib.greeting, "
                 "only imported there; import NameSource from lib.name_source"
             ],
         ),
@@ -131,7 +131,7 @@ from fake_project import Project, case, check
             )
             .check_module("lib.app", "from lib.names import nullcontext"),
             expected=[
-                "line 1, col 23: nullcontext is not defined in lib.names, "
+                "1:23: nullcontext is not defined in lib.names, "
                 "only imported there; import nullcontext from contextlib"
             ],
         ),
@@ -142,7 +142,7 @@ from fake_project import Project, case, check
             .module("lib.names", "from contextlib import suppress as quiet")
             .check_module("lib.app", "from lib.names import quiet"),
             expected=[
-                "line 1, col 23: quiet is not defined in lib.names, "
+                "1:23: quiet is not defined in lib.names, "
                 "only imported there; import suppress from contextlib"
             ],
         ),
@@ -153,7 +153,7 @@ from fake_project import Project, case, check
             .module("lib.names", "import sys")
             .check_module("lib.app", "from lib.names import sys"),
             expected=[
-                "line 1, col 23: sys is not defined in lib.names, "
+                "1:23: sys is not defined in lib.names, "
                 "only imported there as module sys"
             ],
         ),
@@ -165,8 +165,7 @@ from fake_project import Project, case, check
             .module("lib.names", "import os.path")
             .check_module("lib.app", "from lib.names import os"),
             expected=[
-                "line 1, col 23: os is not defined in lib.names, "
-                "only imported there as module os"
+                "1:23: os is not defined in lib.names, only imported there as module os"
             ],
         ),
         case(
@@ -176,7 +175,7 @@ from fake_project import Project, case, check
             .module("lib.names", "import os.path as osp")
             .check_module("lib.app", "from lib.names import osp"),
             expected=[
-                "line 1, col 23: osp is not defined in lib.names, "
+                "1:23: osp is not defined in lib.names, "
                 "only imported there as module os.path"
             ],
         ),
@@ -187,7 +186,7 @@ from fake_project import Project, case, check
             .module("lib.names", "from .greet import greet")
             .check_module("lib.app", "from lib.names import greet"),
             expected=[
-                "line 1, col 23: greet is not defined in lib.names, "
+                "1:23: greet is not defined in lib.names, "
                 "only imported there; import it from the module that defines it"
             ],
         ),

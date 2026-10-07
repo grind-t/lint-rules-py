@@ -3,6 +3,7 @@ from typing import Self
 
 import pytest
 
+from lint_rules._core.violation import Violation
 from lint_rules._usecases.check_source_files import check_source_files
 
 
@@ -47,10 +48,17 @@ class Project:
 
 
 def check(project: Project) -> list[str]:
-    """Messages reported for the checked file; other files only give context."""
+    """Violations of the checked file as "LINE:COL: message", or "message" when
+    they have no location; other files only give context."""
     assert project.checked_path, "the project has no checked file"
     violations = check_source_files(lambda _roots: project.files.items(), ["src"])
-    return [v.message for v in violations if v.path == project.checked_path]
+    return [_render(v) for v in violations if v.path == project.checked_path]
+
+
+def _render(violation: Violation) -> str:
+    if (location := violation.location) is None:
+        return violation.message
+    return f"{location.line}:{location.col}: {violation.message}"
 
 
 def case(description: str, project: Project, *, expected: list[str]):

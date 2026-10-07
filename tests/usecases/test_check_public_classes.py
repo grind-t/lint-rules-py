@@ -20,3 +20,10 @@ def test_passes_module_with_one_public_class():
 
 def test_marker_disables_check():
     assert check("# allow-multiple-public-classes\nclass A: ...\nclass B: ...") == []
+
+
+def test_str_has_no_location():
+    [violation] = check("class A: ...\nclass B: ...")
+    assert str(violation) == (
+        "a.py: 2 public classes (A, B); split them into separate modules"
+    )

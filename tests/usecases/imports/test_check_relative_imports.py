@@ -14,8 +14,7 @@ from fake_project import Project, case, check
                 "lib._usecases.app", "from .._core.greeting import format_greeting"
             ),
             expected=[
-                "line 1, col 1: relative import; "
-                'use "from lib._core.greeting import ..." instead'
+                '1:1: relative import; use "from lib._core.greeting import ..." instead'
             ],
         ),
         case(
@@ -25,8 +24,7 @@ from fake_project import Project, case, check
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from . import greet"),
             expected=[
-                "line 1, col 1: relative import; "
-                'use "from lib._usecases import ..." instead'
+                '1:1: relative import; use "from lib._usecases import ..." instead'
             ],
         ),
         case(
@@ -35,7 +33,7 @@ from fake_project import Project, case, check
             .package("lib")
             .package("lib._usecases")
             .check_module("lib._usecases.app", "from ... import x"),
-            expected=["line 1, col 1: relative import; use an absolute import instead"],
+            expected=["1:1: relative import; use an absolute import instead"],
         ),
         case(
             "resolves package __init__.py against the package itself",
@@ -43,15 +41,14 @@ from fake_project import Project, case, check
             .package("lib")
             .check_package("lib._core", "from .greeting import format_greeting"),
             expected=[
-                "line 1, col 1: relative import; "
-                'use "from lib._core.greeting import ..." instead'
+                '1:1: relative import; use "from lib._core.greeting import ..." instead'
             ],
         ),
         # Not importable, but still checked.
         case(
             "checks file without module name",
             Project().package("lib").check_file("my-dir/x.py", "from . import x"),
-            expected=["line 1, col 1: relative import; use an absolute import instead"],
+            expected=["1:1: relative import; use an absolute import instead"],
         ),
     ],
 )
