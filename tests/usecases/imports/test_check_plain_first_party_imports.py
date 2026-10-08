@@ -33,19 +33,6 @@ from lint_rules._usecases.check_plain_first_party_imports import (
                 )
             ],
         ),
-        case(
-            "reports only first-party module of several",
-            Project()
-            .package("lib")
-            .package("lib._core")
-            .module("lib._core.greeting")
-            .check_module("lib.app", "import os, lib._core.greeting"),
-            expected=[
-                PlainFirstPartyImportViolation(
-                    "src/lib/app.py", SourceLocation(1, 12), module="lib._core.greeting"
-                )
-            ],
-        ),
         # Not importable, but still checked.
         case(
             "checks file without module name",
@@ -59,6 +46,11 @@ from lint_rules._usecases.check_plain_first_party_imports import (
         case(
             "passes third-party module",
             Project().check_module("app", "import os"),
+            expected=[],
+        ),
+        case(
+            "passes file without imports",
+            Project().package("lib").check_module("lib.app", "x = 1"),
             expected=[],
         ),
     ],

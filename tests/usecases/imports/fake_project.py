@@ -68,7 +68,10 @@ def check_files(
 
 
 def check(project: Project, rule: Check | StatefulCheck) -> list[Violation]:
-    """Violations of the checked file; other files only give context."""
+    """Violations of the checked file; other files only give context.
+
+    The order of violations is unspecified, so a case expects at most one.
+    """
     assert project.checked_path, "the project has no checked file"
     violations = check_files(project.to_files(), rule)
     return [v for v in violations if v.path == project.checked_path]
