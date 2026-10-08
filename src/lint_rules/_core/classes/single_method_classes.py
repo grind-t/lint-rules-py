@@ -1,8 +1,8 @@
 import ast
 
 from lint_rules._core.classes.bases import base_name
+from lint_rules._core.shared.statements import statements
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._core.statements import statements
 
 _FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
 

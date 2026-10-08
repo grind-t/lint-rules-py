@@ -1,10 +1,10 @@
 from lint_rules._core.classes.single_method_class_violation import (
     SingleMethodClassViolation,
 )
+from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._core.violation import Violation
 from lint_rules._usecases.check_single_method_classes import (
     check_single_method_classes,
 )

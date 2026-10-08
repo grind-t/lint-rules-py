@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from lint_rules._core.violation import Violation
+from lint_rules._core.shared.violation import Violation
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -12,6 +12,7 @@ class CrowdedDirectoryViolation(Violation):
     def message(self) -> str:
         return (
             f"{self.modules} modules in one directory, more than {self.limit}; "
-            "run a subagent that reads them and groups related modules into "
-            "subpackages by meaning, not into catch-alls like utils or helpers"
+            "run a subagent that reads them and groups them into subpackages "
+            "by feature, not by kind; "
+            "put code used by more than one of those features into shared/"
         )

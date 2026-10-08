@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from lint_rules._core.violation import Violation
+from lint_rules._core.shared.violation import Violation
 
 
 @dataclass(frozen=True, kw_only=True)

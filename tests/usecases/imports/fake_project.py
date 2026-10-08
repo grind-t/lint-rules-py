@@ -4,9 +4,9 @@ from typing import Self
 
 import pytest
 
+from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
-from lint_rules._core.violation import Violation
 from lint_rules._usecases.check_source_files import Check, StatefulCheck
 
 
