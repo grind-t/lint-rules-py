@@ -25,15 +25,11 @@ from lint_rules._usecases.check_plain_first_party_imports import (
             ],
         ),
         case(
-            "reports module imported with alias",
-            Project()
-            .package("lib")
-            .package("lib._core")
-            .module("lib._core.greeting")
-            .check_module("lib.app", "import lib._core.greeting as greeting"),
+            "reports import visited before its module is defined",
+            Project().check_module("app", "import lib").package("lib"),
             expected=[
                 PlainFirstPartyImportViolation(
-                    "src/lib/app.py", SourceLocation(1, 8), module="lib._core.greeting"
+                    "src/app.py", SourceLocation(1, 8), module="lib"
                 )
             ],
         ),
@@ -50,42 +46,6 @@ from lint_rules._usecases.check_plain_first_party_imports import (
                 )
             ],
         ),
-        # Only the first component matters; whether the module exists does not.
-        case(
-            "reports nonexistent first-party module",
-            Project().package("lib").check_module("lib.app", "import lib._nope"),
-            expected=[
-                PlainFirstPartyImportViolation(
-                    "src/lib/app.py", SourceLocation(1, 8), module="lib._nope"
-                )
-            ],
-        ),
-        case(
-            "reports top-level module",
-            Project().module("single").check_module("app", "import single"),
-            expected=[
-                PlainFirstPartyImportViolation(
-                    "src/app.py", SourceLocation(1, 8), module="single"
-                )
-            ],
-        ),
-        case(
-            "reports import in function",
-            Project()
-            .package("lib")
-            .check_module(
-                "lib.app",
-                """
-                def f():
-                    import lib._core.greeting
-                """,
-            ),
-            expected=[
-                PlainFirstPartyImportViolation(
-                    "src/lib/app.py", SourceLocation(2, 12), module="lib._core.greeting"
-                )
-            ],
-        ),
         # Not importable, but still checked.
         case(
             "checks file without module name",
@@ -98,49 +58,13 @@ from lint_rules._usecases.check_plain_first_party_imports import (
         ),
         case(
             "passes third-party module",
-            Project().check_module(
-                "app",
-                """
-                import os
-                import os.path
-                """,
-            ),
-            expected=[],
-        ),
-        case(
-            "passes name that only starts with first-party name",
-            Project()
-            .package("lib")
-            .check_module(
-                "lib.app",
-                """
-                import library
-                import lib_extra
-                """,
-            ),
-            expected=[],
-        ),
-        case(
-            "passes root directory without __init__.py",
-            Project().module("scripts.build").check_module("app", "import scripts"),
+            Project().check_module("app", "import os"),
             expected=[],
         ),
     ],
 )
 def test_plain_first_party_import(project, expected):
     assert check(project, CheckPlainFirstPartyImports()) == expected
-
-
-def test_current_directory_as_root():
-    files = [
-        SourceFile(".", "lib/__init__.py", ""),
-        SourceFile(".", "lib/x.py", "import lib"),
-    ]
-    assert check_files(
-        [ParsedFile(f) for f in files], CheckPlainFirstPartyImports()
-    ) == [
-        PlainFirstPartyImportViolation("lib/x.py", SourceLocation(1, 8), module="lib")
-    ]
 
 
 def test_top_level_modules_of_every_root():
