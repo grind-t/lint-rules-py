@@ -18,3 +18,14 @@ def test_runs_every_check_on_every_file():
         }
     )
     assert [v.path for v in check_source_files(files, ["src"])] == ["a.py", "b.py"]
+
+
+def test_runs_stateful_checks_across_files():
+    files = fake_read_files(
+        {
+            "lib/__init__.py": "",
+            "lib/a.py": "",
+            "lib/b.py": "from lib import a",
+        }
+    )
+    assert [v.path for v in check_source_files(files, ["src"])] == ["lib/b.py"]
