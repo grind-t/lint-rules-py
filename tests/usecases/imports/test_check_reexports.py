@@ -1,9 +1,11 @@
 import pytest
 from fake_project import Project, case, check
 
+from lint_rules._core.reexports.reexported_module_violation import (
+    ReexportedModuleViolation,
+)
+from lint_rules._core.reexports.reexported_name_violation import ReexportedNameViolation
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._core.violations.reexported_module import ReexportedModuleViolation
-from lint_rules._core.violations.reexported_name import ReexportedNameViolation
 
 
 @pytest.mark.parametrize(

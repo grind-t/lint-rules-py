@@ -1,9 +1,9 @@
+from lint_rules._core.classes.multiple_public_classes_violation import (
+    MultiplePublicClassesViolation,
+)
 from lint_rules._core.classes.public_classes import public_classes
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.violation import Violation
-from lint_rules._core.violations.multiple_public_classes import (
-    MultiplePublicClassesViolation,
-)
 
 _MARKER = "# allow-multiple-public-classes"
 

@@ -1,6 +1,6 @@
 import pytest
 
-from lint_rules._core.crowded_directories import crowded_directories
+from lint_rules._core.layout.crowded_directories import crowded_directories
 
 
 def _modules(directory: str, count: int) -> list[str]:

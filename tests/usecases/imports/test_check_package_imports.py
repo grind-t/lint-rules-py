@@ -1,12 +1,16 @@
 import pytest
 from fake_project import Project, case, check
 
-from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._core.violations.module_imported_as_name import (
+from lint_rules._core.imports.module_imported_as_name_violation import (
     ModuleImportedAsNameViolation,
 )
-from lint_rules._core.violations.name_from_package import NameFromPackageViolation
-from lint_rules._core.violations.name_in_package_init import NameInPackageInitViolation
+from lint_rules._core.imports.name_from_package_violation import (
+    NameFromPackageViolation,
+)
+from lint_rules._core.imports.name_in_package_init_violation import (
+    NameInPackageInitViolation,
+)
+from lint_rules._core.source.source_location import SourceLocation
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,9 @@
-from lint_rules._core.crowded_directories import crowded_directories
+from lint_rules._core.layout.crowded_directories import crowded_directories
+from lint_rules._core.layout.crowded_directory_violation import (
+    CrowdedDirectoryViolation,
+)
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.violation import Violation
-from lint_rules._core.violations.crowded_directory import CrowdedDirectoryViolation
 
 _LIMIT = 10
 

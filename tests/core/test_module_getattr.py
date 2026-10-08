@@ -2,7 +2,7 @@ import symtable
 
 import pytest
 
-from lint_rules._core.module_getattr import binds_module_getattr
+from lint_rules._core.reexports.module_getattr import binds_module_getattr
 
 
 @pytest.mark.parametrize(

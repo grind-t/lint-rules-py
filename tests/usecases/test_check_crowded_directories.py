@@ -1,6 +1,8 @@
+from lint_rules._core.layout.crowded_directory_violation import (
+    CrowdedDirectoryViolation,
+)
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
-from lint_rules._core.violations.crowded_directory import CrowdedDirectoryViolation
 from lint_rules._usecases.check_crowded_directories import CheckCrowdedDirectories
 
 
