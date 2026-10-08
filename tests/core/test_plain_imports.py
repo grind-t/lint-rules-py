@@ -2,8 +2,8 @@ import ast
 
 import pytest
 
-from lint_rules._core.plain_imports import plain_imports
-from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.imports.plain_imports import plain_imports
+from lint_rules._core.source.source_location import SourceLocation
 
 
 @pytest.mark.parametrize(

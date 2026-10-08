@@ -1,7 +1,7 @@
 import ast
 import symtable
 
-from lint_rules._core.source_file import SourceFile
+from lint_rules._core.source.source_file import SourceFile
 
 
 class ParsedFile:

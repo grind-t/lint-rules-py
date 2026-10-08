@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.source.source_location import SourceLocation
 from lint_rules._core.violation import Violation
 
 

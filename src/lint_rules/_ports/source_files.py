@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from typing import Protocol
 
-from lint_rules._core.source_file import SourceFile
+from lint_rules._core.source.source_file import SourceFile
 
 
 class ReadSourceFiles(Protocol):

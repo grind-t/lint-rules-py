@@ -1,4 +1,4 @@
-from lint_rules._core.source_file import SourceFile
+from lint_rules._core.source.source_file import SourceFile
 from lint_rules._usecases.check_source_files import check_source_files
 
 

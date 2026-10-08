@@ -1,9 +1,10 @@
 from collections.abc import Callable, Iterable
 from typing import Protocol
 
-from lint_rules._core.parsed_file import ParsedFile
+from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.violation import Violation
 from lint_rules._ports.source_files import ReadSourceFiles
+from lint_rules._usecases.check_crowded_directories import CheckCrowdedDirectories
 from lint_rules._usecases.check_module_getattr import check_module_getattr
 from lint_rules._usecases.check_plain_first_party_imports import (
     CheckPlainFirstPartyImports,
@@ -36,6 +37,7 @@ _CHECKS: tuple[Check, ...] = (
 
 _STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (
     CheckPlainFirstPartyImports,
+    CheckCrowdedDirectories,
 )
 
 

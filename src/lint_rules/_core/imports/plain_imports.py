@@ -1,6 +1,6 @@
 import ast
 
-from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.source.source_location import SourceLocation
 from lint_rules._core.statements import statements
 
 

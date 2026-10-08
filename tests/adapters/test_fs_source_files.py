@@ -1,5 +1,5 @@
 from lint_rules._adapters.fs_source_files import read_fs_source_files
-from lint_rules._core.source_file import SourceFile
+from lint_rules._core.source.source_file import SourceFile
 
 
 def test_reads_python_files_recursively_in_sorted_order(tmp_path):

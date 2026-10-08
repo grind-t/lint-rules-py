@@ -1,6 +1,6 @@
 import pytest
 
-from lint_rules._core.first_party import is_first_party
+from lint_rules._core.imports.first_party import is_first_party
 
 
 @pytest.mark.parametrize(

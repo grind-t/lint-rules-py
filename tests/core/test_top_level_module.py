@@ -1,6 +1,6 @@
 import pytest
 
-from lint_rules._core.top_level_module import top_level_module
+from lint_rules._core.imports.top_level_module import top_level_module
 
 
 @pytest.mark.parametrize(

@@ -1,5 +1,5 @@
 from lint_rules._core.module_getattr import binds_module_getattr
-from lint_rules._core.parsed_file import ParsedFile
+from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.violation import Violation
 from lint_rules._core.violations.module_getattr import ModuleGetattrViolation
 

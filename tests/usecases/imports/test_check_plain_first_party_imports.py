@@ -1,9 +1,9 @@
 import pytest
 from fake_project import Project, case, check, check_files
 
-from lint_rules._core.parsed_file import ParsedFile
-from lint_rules._core.source_file import SourceFile
-from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.source.parsed_file import ParsedFile
+from lint_rules._core.source.source_file import SourceFile
+from lint_rules._core.source.source_location import SourceLocation
 from lint_rules._core.violations.plain_first_party_import import (
     PlainFirstPartyImportViolation,
 )

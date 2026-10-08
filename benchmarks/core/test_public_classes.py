@@ -2,7 +2,7 @@ import ast
 
 import pytest
 
-from lint_rules._core.public_classes import public_classes
+from lint_rules._core.classes.public_classes import public_classes
 
 
 @pytest.mark.parametrize("n_classes", [10, 100, 1000])

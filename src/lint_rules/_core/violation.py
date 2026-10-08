@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.source.source_location import SourceLocation
 
 
 @dataclass(frozen=True)

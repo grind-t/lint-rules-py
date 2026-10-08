@@ -2,7 +2,7 @@ import ast
 
 import pytest
 
-from lint_rules._core.single_method_classes import single_method_classes
+from lint_rules._core.classes.single_method_classes import single_method_classes
 
 
 @pytest.mark.parametrize("n_classes", [10, 100, 1000])

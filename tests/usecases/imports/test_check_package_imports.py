@@ -1,7 +1,7 @@
 import pytest
 from fake_project import Project, case, check
 
-from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.source.source_location import SourceLocation
 from lint_rules._core.violations.module_imported_as_name import (
     ModuleImportedAsNameViolation,
 )

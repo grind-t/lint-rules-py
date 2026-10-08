@@ -1,6 +1,6 @@
 import ast
 
-from lint_rules._core.bases import base_name
+from lint_rules._core.classes.bases import base_name
 
 _ENUM_BASES = {"Enum", "IntEnum", "StrEnum", "Flag", "IntFlag"}
 _EXCEPTION_SUFFIXES = ("Error", "Exception", "Warning")

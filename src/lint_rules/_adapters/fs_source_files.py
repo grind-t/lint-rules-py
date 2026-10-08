@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Iterator
 from pathlib import Path
 
-from lint_rules._core.source_file import SourceFile
+from lint_rules._core.source.source_file import SourceFile
 
 
 def read_fs_source_files(roots: Iterable[str]) -> Iterator[SourceFile]:

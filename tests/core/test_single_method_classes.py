@@ -2,8 +2,8 @@ import ast
 
 import pytest
 
-from lint_rules._core.single_method_classes import single_method_classes
-from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.classes.single_method_classes import single_method_classes
+from lint_rules._core.source.source_location import SourceLocation
 
 
 @pytest.mark.parametrize(
