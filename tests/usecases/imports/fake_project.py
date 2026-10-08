@@ -1,10 +1,13 @@
+from collections.abc import Iterable
 from textwrap import dedent
 from typing import Self
 
 import pytest
 
+from lint_rules._core.parsed_file import ParsedFile
+from lint_rules._core.source_file import SourceFile
 from lint_rules._core.violation import Violation
-from lint_rules._usecases.check_source_files import check_source_files
+from lint_rules._usecases.check_source_files import Check, StatefulCheck
 
 
 class Project:
@@ -38,6 +41,12 @@ class Project:
         self.checked_path = f"src/{path}"
         return self.file(path, source)
 
+    def to_files(self) -> list[ParsedFile]:
+        return [
+            ParsedFile(SourceFile("src", path, source))
+            for path, source in self.files.items()
+        ]
+
     @staticmethod
     def _package_path(name: str) -> str:
         return name.replace(".", "/") + "/__init__.py"
@@ -47,10 +56,21 @@ class Project:
         return name.replace(".", "/") + ".py"
 
 
-def check(project: Project) -> list[Violation]:
+def check_files(
+    files: Iterable[ParsedFile], rule: Check | StatefulCheck
+) -> list[Violation]:
+    """Run only this rule on the files."""
+    if callable(rule):
+        return [violation for file in files for violation in rule(file)]
+    for file in files:
+        rule.visit(file)
+    return rule.finish()
+
+
+def check(project: Project, rule: Check | StatefulCheck) -> list[Violation]:
     """Violations of the checked file; other files only give context."""
     assert project.checked_path, "the project has no checked file"
-    violations = check_source_files(lambda _roots: project.files.items(), ["src"])
+    violations = check_files(project.to_files(), rule)
     return [v for v in violations if v.path == project.checked_path]
 
 

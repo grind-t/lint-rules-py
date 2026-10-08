@@ -1,30 +1,10 @@
 import ast
-from collections.abc import Iterator
 
 from lint_rules._core.bases import base_name
 from lint_rules._core.source_location import SourceLocation
+from lint_rules._core.statements import statements
 
 _FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
-_BLOCK_FIELDS = ("body", "orelse", "finalbody", "handlers", "cases")
-_BLOCK_TYPES = (ast.stmt, ast.excepthandler, ast.match_case)
-
-
-def _statements(tree: ast.Module) -> Iterator[ast.AST]:
-    """Every statement block of a module, without descending into expressions.
-
-    Classes can only appear among statements, so this finds the same classes
-    as ``ast.walk`` while skipping the bulk of the tree.
-    """
-    stack: list[ast.AST] = [tree]
-    while stack:
-        node = stack.pop()
-        yield node
-        for field in _BLOCK_FIELDS:
-            block = getattr(node, field, None)
-            if isinstance(block, list):
-                stack.extend(
-                    child for child in block if isinstance(child, _BLOCK_TYPES)
-                )
 
 
 def _is_filler(stmt: ast.stmt) -> bool:
@@ -64,7 +44,7 @@ def single_method_classes(tree: ast.Module) -> list[tuple[str, str, SourceLocati
     """
     found = [
         (node.name, method, SourceLocation(node.lineno, node.col_offset + 1))
-        for node in _statements(tree)
+        for node in statements(tree)
         if isinstance(node, ast.ClassDef) and (method := _single_method(node))
     ]
     return sorted(found, key=lambda item: item[2])

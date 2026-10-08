@@ -1,4 +1,5 @@
 from lint_rules._core.parsed_file import ParsedFile
+from lint_rules._core.source_file import SourceFile
 from lint_rules._core.source_location import SourceLocation
 from lint_rules._core.violation import Violation
 from lint_rules._core.violations.single_method_class import SingleMethodClassViolation
@@ -8,7 +9,7 @@ from lint_rules._usecases.check_single_method_classes import (
 
 
 def check(source: str) -> list[Violation]:
-    return check_single_method_classes(ParsedFile("a.py", source))
+    return check_single_method_classes(ParsedFile(SourceFile(".", "a.py", source)))
 
 
 def test_reports_class_with_single_method():

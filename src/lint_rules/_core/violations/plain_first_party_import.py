@@ -4,12 +4,12 @@ from lint_rules._core.violation import Violation
 
 
 @dataclass(frozen=True, kw_only=True)
-class FirstPartyModuleImportViolation(Violation):
+class PlainFirstPartyImportViolation(Violation):
     module: str
 
     @property
     def message(self) -> str:
         return (
-            f'"import {self.module}" binds a first-party module; '
-            'use "from <module> import <name>" instead'
+            f'"import {self.module}" of a first-party module; '
+            f'use "from {self.module} import <name>" instead'
         )

@@ -1,11 +1,15 @@
 import pytest
-from fake_project import Project, case, check
+from fake_project import Project, case, check, check_files
 
+from lint_rules._core.parsed_file import ParsedFile
+from lint_rules._core.source_file import SourceFile
 from lint_rules._core.source_location import SourceLocation
-from lint_rules._core.violations.first_party_module_import import (
-    FirstPartyModuleImportViolation,
+from lint_rules._core.violations.plain_first_party_import import (
+    PlainFirstPartyImportViolation,
 )
-from lint_rules._usecases.check_source_files import check_source_files
+from lint_rules._usecases.check_plain_first_party_imports import (
+    CheckPlainFirstPartyImports,
+)
 
 
 @pytest.mark.parametrize(
@@ -15,7 +19,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports root package",
             Project().package("lib").check_module("lib.app", "import lib"),
             expected=[
-                FirstPartyModuleImportViolation(
+                PlainFirstPartyImportViolation(
                     "src/lib/app.py", SourceLocation(1, 8), module="lib"
                 )
             ],
@@ -28,7 +32,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             .module("lib._core.greeting")
             .check_module("lib.app", "import lib._core.greeting as greeting"),
             expected=[
-                FirstPartyModuleImportViolation(
+                PlainFirstPartyImportViolation(
                     "src/lib/app.py", SourceLocation(1, 8), module="lib._core.greeting"
                 )
             ],
@@ -41,7 +45,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             .module("lib._core.greeting")
             .check_module("lib.app", "import os, lib._core.greeting"),
             expected=[
-                FirstPartyModuleImportViolation(
+                PlainFirstPartyImportViolation(
                     "src/lib/app.py", SourceLocation(1, 12), module="lib._core.greeting"
                 )
             ],
@@ -51,7 +55,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports nonexistent first-party module",
             Project().package("lib").check_module("lib.app", "import lib._nope"),
             expected=[
-                FirstPartyModuleImportViolation(
+                PlainFirstPartyImportViolation(
                     "src/lib/app.py", SourceLocation(1, 8), module="lib._nope"
                 )
             ],
@@ -60,7 +64,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "reports top-level module",
             Project().module("single").check_module("app", "import single"),
             expected=[
-                FirstPartyModuleImportViolation(
+                PlainFirstPartyImportViolation(
                     "src/app.py", SourceLocation(1, 8), module="single"
                 )
             ],
@@ -77,7 +81,7 @@ from lint_rules._usecases.check_source_files import check_source_files
                 """,
             ),
             expected=[
-                FirstPartyModuleImportViolation(
+                PlainFirstPartyImportViolation(
                     "src/lib/app.py", SourceLocation(2, 12), module="lib._core.greeting"
                 )
             ],
@@ -87,7 +91,7 @@ from lint_rules._usecases.check_source_files import check_source_files
             "checks file without module name",
             Project().package("lib").check_file("my-dir/x.py", "import lib"),
             expected=[
-                FirstPartyModuleImportViolation(
+                PlainFirstPartyImportViolation(
                     "src/my-dir/x.py", SourceLocation(1, 8), module="lib"
                 )
             ],
@@ -123,12 +127,31 @@ from lint_rules._usecases.check_source_files import check_source_files
         ),
     ],
 )
-def test_import_of_first_party_module(project, expected):
-    assert check(project) == expected
+def test_plain_first_party_import(project, expected):
+    assert check(project, CheckPlainFirstPartyImports()) == expected
 
 
 def test_current_directory_as_root():
-    files = {"lib/__init__.py": "", "lib/x.py": "import lib"}
-    assert check_source_files(lambda _roots: files.items(), ["."]) == [
-        FirstPartyModuleImportViolation("lib/x.py", SourceLocation(1, 8), module="lib")
+    files = [
+        SourceFile(".", "lib/__init__.py", ""),
+        SourceFile(".", "lib/x.py", "import lib"),
+    ]
+    assert check_files(
+        [ParsedFile(f) for f in files], CheckPlainFirstPartyImports()
+    ) == [
+        PlainFirstPartyImportViolation("lib/x.py", SourceLocation(1, 8), module="lib")
+    ]
+
+
+def test_top_level_modules_of_every_root():
+    files = [
+        SourceFile("tests", "tests/conftest.py", ""),
+        SourceFile("src", "src/lib/x.py", "import conftest"),
+    ]
+    assert check_files(
+        [ParsedFile(f) for f in files], CheckPlainFirstPartyImports()
+    ) == [
+        PlainFirstPartyImportViolation(
+            "src/lib/x.py", SourceLocation(1, 8), module="conftest"
+        )
     ]

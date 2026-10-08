@@ -2,6 +2,7 @@ import pytest
 from fake_project import Project, case, check
 
 from lint_rules._core.violations.module_getattr import ModuleGetattrViolation
+from lint_rules._usecases.check_module_getattr import check_module_getattr
 
 
 @pytest.mark.parametrize(
@@ -67,4 +68,4 @@ from lint_rules._core.violations.module_getattr import ModuleGetattrViolation
     ],
 )
 def test_module_getattr(project, expected):
-    assert check(project) == expected
+    assert check(project, check_module_getattr) == expected
