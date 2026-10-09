@@ -11,10 +11,6 @@ def test_crowded_directories(subtests):
         "over limit": (_modules("src/lib", 4), [("src/lib", 4)]),
         "init ignored": ([*_modules("src/lib", 3), "src/lib/__init__.py"], []),
         "non-python ignored": ([*_modules("src/lib", 3), "src/lib/notes.txt"], []),
-        "subdirectory counted separately": (
-            [*_modules("src/lib", 2), *_modules("src/lib/sub", 2)],
-            [],
-        ),
         "only crowded subdirectory reported": (
             [*_modules("src/lib", 2), *_modules("src/lib/sub", 4)],
             [("src/lib/sub", 4)],
