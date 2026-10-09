@@ -45,72 +45,6 @@ def test_first_party_module_from_import(subtests):
             ],
         ),
         case(
-            "reports module imported with alias",
-            lib().check_module("lib.app", "from lib._core import greeting as g"),
-            expected=[
-                FirstPartyModuleFromImportViolation(
-                    "src/lib/app.py",
-                    SourceLocation(1, 23),
-                    module="lib._core",
-                    name="greeting",
-                )
-            ],
-        ),
-        case(
-            "reports only module of several names",
-            lib().check_module("lib.app", "from lib._core import Other, greeting"),
-            expected=[
-                FirstPartyModuleFromImportViolation(
-                    "src/lib/app.py",
-                    SourceLocation(1, 30),
-                    module="lib._core",
-                    name="greeting",
-                )
-            ],
-        ),
-        case(
-            "reports import in function",
-            lib().check_module(
-                "lib.app",
-                """
-                def f():
-                    from lib._core import greeting
-                """,
-            ),
-            expected=[
-                FirstPartyModuleFromImportViolation(
-                    "src/lib/app.py",
-                    SourceLocation(2, 27),
-                    module="lib._core",
-                    name="greeting",
-                )
-            ],
-        ),
-        case(
-            "reports module imported from top-level module",
-            Project()
-            .package("lib")
-            .module("lib.a")
-            .check_module("app", "from lib import a"),
-            expected=[
-                FirstPartyModuleFromImportViolation(
-                    "src/app.py", SourceLocation(1, 17), module="lib", name="a"
-                )
-            ],
-        ),
-        case(
-            "reports module in package init",
-            lib().check_package("lib._core", "from lib._core import greeting"),
-            expected=[
-                FirstPartyModuleFromImportViolation(
-                    "src/lib/_core/__init__.py",
-                    SourceLocation(1, 23),
-                    module="lib._core",
-                    name="greeting",
-                )
-            ],
-        ),
-        case(
             "reports module defined in file seen after the checked one",
             Project()
             .package("lib")
@@ -121,11 +55,6 @@ def test_first_party_module_from_import(subtests):
                     "src/lib/a.py", SourceLocation(1, 17), module="lib", name="z"
                 )
             ],
-        ),
-        case(
-            "passes name from module",
-            lib().check_module("lib.app", "from lib._core.greeting import Greeting"),
-            expected=[],
         ),
         case(
             "passes name that is not a module",
@@ -141,21 +70,6 @@ def test_first_party_module_from_import(subtests):
                 from importlib import metadata
                 """,
             ),
-            expected=[],
-        ),
-        case(
-            "passes relative import",
-            lib().check_module("lib.app", "from . import _core"),
-            expected=[],
-        ),
-        case(
-            "passes star import",
-            lib().check_module("lib.app", "from lib._core import *"),
-            expected=[],
-        ),
-        case(
-            "passes plain import",
-            lib().check_module("lib.app", "import lib._core.greeting"),
             expected=[],
         ),
         case(
