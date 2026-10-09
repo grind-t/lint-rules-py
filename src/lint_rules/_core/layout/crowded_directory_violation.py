@@ -12,7 +12,6 @@ class CrowdedDirectoryViolation(Violation):
     def message(self) -> str:
         return (
             f"{self.modules} modules in one directory, more than {self.limit}; "
-            "run a subagent that reads them and groups them into subpackages "
-            "by feature, not by kind; "
+            "run a subagent that reads them and groups them into subpackages; "
             "put code used by more than one of those features into shared/"
         )
