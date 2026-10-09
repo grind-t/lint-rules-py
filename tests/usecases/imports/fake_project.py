@@ -2,8 +2,6 @@ from collections.abc import Iterable
 from textwrap import dedent
 from typing import Self
 
-import pytest
-
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
@@ -77,5 +75,7 @@ def check(project: Project, rule: Check | StatefulCheck) -> list[Violation]:
     return [v for v in violations if v.path == project.checked_path]
 
 
-def case(description: str, project: Project, *, expected: list[Violation]):
-    return pytest.param(project, expected, id=description)
+def case(
+    description: str, project: Project, *, expected: list[Violation]
+) -> tuple[str, Project, list[Violation]]:
+    return description, project, expected

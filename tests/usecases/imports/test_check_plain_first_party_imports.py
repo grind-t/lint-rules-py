@@ -1,4 +1,3 @@
-import pytest
 from fake_project import Project, case, check, check_files
 
 from lint_rules._core.imports.plain_first_party_import_violation import (
@@ -12,9 +11,8 @@ from lint_rules._usecases.check_plain_first_party_imports import (
 )
 
 
-@pytest.mark.parametrize(
-    ("project", "expected"),
-    [
+def test_plain_first_party_import(subtests):
+    cases = [
         case(
             "reports root package",
             Project().package("lib").check_module("lib.app", "import lib"),
@@ -53,10 +51,10 @@ from lint_rules._usecases.check_plain_first_party_imports import (
             Project().package("lib").check_module("lib.app", "x = 1"),
             expected=[],
         ),
-    ],
-)
-def test_plain_first_party_import(project, expected):
-    assert check(project, CheckPlainFirstPartyImports()) == expected
+    ]
+    for description, project, expected in cases:
+        with subtests.test(description):
+            assert check(project, CheckPlainFirstPartyImports()) == expected
 
 
 def test_top_level_modules_of_every_root():

@@ -1,13 +1,11 @@
-import pytest
 from fake_project import Project, case, check
 
 from lint_rules._core.reexports.module_getattr_violation import ModuleGetattrViolation
 from lint_rules._usecases.check_module_getattr import check_module_getattr
 
 
-@pytest.mark.parametrize(
-    ("project", "expected"),
-    [
+def test_module_getattr(subtests):
+    cases = [
         case(
             "reports def __getattr__",
             Project().check_module("app", "def __getattr__(name): ..."),
@@ -65,7 +63,7 @@ from lint_rules._usecases.check_module_getattr import check_module_getattr
             Project().check_module("app", "def __dir__(): ..."),
             expected=[],
         ),
-    ],
-)
-def test_module_getattr(project, expected):
-    assert check(project, check_module_getattr) == expected
+    ]
+    for description, project, expected in cases:
+        with subtests.test(description):
+            assert check(project, check_module_getattr) == expected

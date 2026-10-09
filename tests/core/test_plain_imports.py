@@ -1,14 +1,11 @@
 import ast
 
-import pytest
-
 from lint_rules._core.imports.plain_imports import plain_imports
 from lint_rules._core.source.source_location import SourceLocation
 
 
-@pytest.mark.parametrize(
-    ("source", "expected"),
-    [
+def test_plain_imports(subtests):
+    cases = [
         ("import lib", [("lib", SourceLocation(1, 8))]),
         ("import lib.app as app", [("lib.app", SourceLocation(1, 8))]),
         (
@@ -22,7 +19,7 @@ from lint_rules._core.source.source_location import SourceLocation
         ("try:\n    import a\nexcept ImportError: ...", [("a", SourceLocation(2, 12))]),
         ("from lib import app", []),
         ("x = __import__('lib')", []),
-    ],
-)
-def test_plain_imports(source, expected):
-    assert plain_imports(ast.parse(source)) == expected
+    ]
+    for source, expected in cases:
+        with subtests.test(repr(source)):
+            assert plain_imports(ast.parse(source)) == expected

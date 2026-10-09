@@ -1,14 +1,11 @@
 import ast
 
-import pytest
-
 from lint_rules._core.classes.single_method_classes import single_method_classes
 from lint_rules._core.source.source_location import SourceLocation
 
 
-@pytest.mark.parametrize(
-    ("source", "expected"),
-    [
+def test_single_method_classes(subtests):
+    cases = [
         ("class A:\n    def run(self): ...", [("A", "run", SourceLocation(1, 1))]),
         (
             'class A:\n    """Doc."""\n    def run(self): ...',
@@ -51,10 +48,10 @@ from lint_rules._core.source.source_location import SourceLocation
         ("class A:\n    x = 1\n    def run(self): ...", []),
         ("class A(Base):\n    def run(self): ...", []),
         ("class A(metaclass=M):\n    def run(self): ...", []),
-    ],
-)
-def test_single_method_classes(source, expected):
-    assert single_method_classes(ast.parse(source)) == expected
+    ]
+    for source, expected in cases:
+        with subtests.test(repr(source)):
+            assert single_method_classes(ast.parse(source)) == expected
 
 
 def test_finds_classes_in_every_block_in_line_order():

@@ -1,5 +1,3 @@
-import pytest
-
 from lint_rules._core.layout.unshared_modules import unshared_modules
 
 _MODULES = {
@@ -14,19 +12,17 @@ def _check(imports: dict[str, set[str]]):
     return unshared_modules(files | imports, _MODULES)
 
 
-@pytest.mark.parametrize(
-    ("imports", "expected"),
-    [
-        (
+def test_unshared_modules(subtests):
+    cases = {
+        "module used by two features is shared": (
             {"lib/a/x.py": {"lib.shared.base"}, "lib/b/y.py": {"lib.shared.base"}},
             [("lib/shared/walk.py", ())],
         ),
-        (
+        "module used by one feature is reported": (
             {"lib/a/x.py": {"lib.shared.base"}, "lib/a/y.py": {"lib.shared.base"}},
             [("lib/shared/base.py", ("a",)), ("lib/shared/walk.py", ())],
         ),
-        # "from lib.shared import base" names the submodule too.
-        (
+        "from-import names the submodule too": (
             {
                 "lib/a/x.py": {"lib.shared", "lib.shared.base"},
                 "lib/b/y.py": {"lib.shared.walk"},
@@ -34,8 +30,7 @@ def _check(imports: dict[str, set[str]]):
             },
             [("lib/shared/base.py", ("a",))],
         ),
-        # Used through another shared module.
-        (
+        "used through another shared module": (
             {
                 "lib/shared/walk.py": {"lib.shared.base"},
                 "lib/a/x.py": {"lib.shared.walk"},
@@ -43,8 +38,7 @@ def _check(imports: dict[str, set[str]]):
             },
             [],
         ),
-        # Importers outside the owner and directly in it are not features.
-        (
+        "importers outside the owner and directly in it are not features": (
             {
                 "app/x.py": {"lib.shared.base", "lib.shared.walk"},
                 "lib/main.py": {"lib.shared.base", "lib.shared.walk"},
@@ -52,10 +46,10 @@ def _check(imports: dict[str, set[str]]):
             },
             [("lib/shared/base.py", ("a",)), ("lib/shared/walk.py", ("a",))],
         ),
-    ],
-)
-def test_unshared_modules(imports, expected):
-    assert _check(imports) == expected
+    }
+    for name, (imports, expected) in cases.items():
+        with subtests.test(name):
+            assert _check(imports) == expected
 
 
 def test_nearest_shared_owns_the_module():

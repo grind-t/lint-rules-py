@@ -1,11 +1,8 @@
-import pytest
-
 from lint_rules._core.imports.top_level_module import top_level_module
 
 
-@pytest.mark.parametrize(
-    ("path", "root", "expected"),
-    [
+def test_top_level_module(subtests):
+    cases = [
         ("src/lib/__init__.py", "src", "lib"),
         ("src/single.py", "src", "single"),
         ("src/single.py", "src/", "single"),
@@ -17,7 +14,7 @@ from lint_rules._core.imports.top_level_module import top_level_module
         ("src/notes.txt", "src", None),
         ("srcx/single.py", "src", None),
         ("a.py", "src", None),
-    ],
-)
-def test_top_level_module(path, root, expected):
-    assert top_level_module(path, root) == expected
+    ]
+    for path, root, expected in cases:
+        with subtests.test(f"{path} (root {root})"):
+            assert top_level_module(path, root) == expected

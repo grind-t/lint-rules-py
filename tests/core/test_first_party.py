@@ -1,17 +1,14 @@
-import pytest
-
 from lint_rules._core.imports.first_party import is_first_party
 
 
-@pytest.mark.parametrize(
-    ("module", "expected"),
-    [
+def test_is_first_party(subtests):
+    cases = [
         ("lib", True),
         ("lib.sub.mod", True),
         ("other", False),
         ("other.lib", False),
         ("libx", False),
-    ],
-)
-def test_is_first_party(module, expected):
-    assert is_first_party(module, {"lib"}) == expected
+    ]
+    for module, expected in cases:
+        with subtests.test(module):
+            assert is_first_party(module, {"lib"}) == expected
