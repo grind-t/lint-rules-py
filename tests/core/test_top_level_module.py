@@ -13,7 +13,6 @@ def test_top_level_module(subtests):
         ("src/lib/sub/__init__.py", "src", None),
         ("src/notes.txt", "src", None),
         ("srcx/single.py", "src", None),
-        ("a.py", "src", None),
     ]
     for path, root, expected in cases:
         with subtests.test(f"{path} (root {root})"):

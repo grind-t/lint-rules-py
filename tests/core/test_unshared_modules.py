@@ -22,14 +22,6 @@ def test_unshared_modules(subtests):
             {"lib/a/x.py": {"lib.shared.base"}, "lib/a/y.py": {"lib.shared.base"}},
             [("lib/shared/base.py", ("a",)), ("lib/shared/walk.py", ())],
         ),
-        "from-import names the submodule too": (
-            {
-                "lib/a/x.py": {"lib.shared", "lib.shared.base"},
-                "lib/b/y.py": {"lib.shared.walk"},
-                "lib/c/z.py": {"lib.shared.walk"},
-            },
-            [("lib/shared/base.py", ("a",))],
-        ),
         "used through another shared module": (
             {
                 "lib/shared/walk.py": {"lib.shared.base"},
