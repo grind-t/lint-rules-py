@@ -3,7 +3,9 @@ from lint_rules._core.layout.crowded_directory_violation import (
 )
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
-from lint_rules._usecases.check_crowded_directories import CheckCrowdedDirectories
+from lint_rules._usecases.layout.check_crowded_directories import (
+    CheckCrowdedDirectories,
+)
 
 
 def _check(modules: int):

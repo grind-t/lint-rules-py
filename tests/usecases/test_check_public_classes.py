@@ -4,7 +4,7 @@ from lint_rules._core.classes.multiple_public_classes_violation import (
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
-from lint_rules._usecases.check_public_classes import check_public_classes
+from lint_rules._usecases.classes.check_public_classes import check_public_classes
 
 
 def check(source: str) -> list[Violation]:

@@ -1,47 +1,34 @@
 from collections.abc import Callable
-from typing import Protocol, runtime_checkable
 
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._ports.source_files import ReadSourceFiles
-from lint_rules._usecases.check_crowded_directories import CheckCrowdedDirectories
-from lint_rules._usecases.check_first_party_module_from_imports import (
-    CheckFirstPartyModuleFromImports,
-)
-from lint_rules._usecases.check_impure_imports import (
-    check_impure_imports,
-)
-from lint_rules._usecases.check_module_getattr import check_module_getattr
-from lint_rules._usecases.check_non_empty_inits import check_non_empty_inits
-from lint_rules._usecases.check_plain_first_party_imports import (
-    CheckPlainFirstPartyImports,
-)
-from lint_rules._usecases.check_public_classes import check_public_classes
-from lint_rules._usecases.check_single_method_classes import (
+from lint_rules._usecases.classes.check_public_classes import check_public_classes
+from lint_rules._usecases.classes.check_single_method_classes import (
     check_single_method_classes,
 )
-from lint_rules._usecases.check_unimported_public_names import (
+from lint_rules._usecases.imports.check_first_party_module_from_imports import (
+    CheckFirstPartyModuleFromImports,
+)
+from lint_rules._usecases.imports.check_impure_imports import (
+    check_impure_imports,
+)
+from lint_rules._usecases.imports.check_plain_first_party_imports import (
+    CheckPlainFirstPartyImports,
+)
+from lint_rules._usecases.layout.check_crowded_directories import (
+    CheckCrowdedDirectories,
+)
+from lint_rules._usecases.layout.check_unshared_modules import CheckUnsharedModules
+from lint_rules._usecases.names.check_unimported_public_names import (
     CheckUnimportedPublicNames,
 )
-from lint_rules._usecases.check_unshared_modules import CheckUnsharedModules
+from lint_rules._usecases.reexports.check_module_getattr import check_module_getattr
+from lint_rules._usecases.reexports.check_non_empty_inits import check_non_empty_inits
+from lint_rules._usecases.stateful_check import StatefulCheck
+from lint_rules._usecases.stateless_check import StatelessCheck
 
-type Check = Callable[[ParsedFile], list[Violation]]
-
-
-@runtime_checkable
-class StatefulCheck(Protocol):
-    """A check that needs every file before it can report, e.g. across files."""
-
-    def visit(self, file: ParsedFile) -> None:
-        """Collect what the check needs from one file."""
-        ...
-
-    def finish(self) -> list[Violation]:
-        """Report once every file has been visited."""
-        ...
-
-
-_CHECKS: tuple[Check, ...] = (
+_CHECKS: tuple[StatelessCheck, ...] = (
     check_public_classes,
     check_single_method_classes,
     check_module_getattr,

@@ -4,7 +4,7 @@ from lint_rules._core.names.unimported_public_name_violation import (
     UnimportedPublicNameViolation,
 )
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._usecases.check_unimported_public_names import (
+from lint_rules._usecases.names.check_unimported_public_names import (
     CheckUnimportedPublicNames,
 )
 

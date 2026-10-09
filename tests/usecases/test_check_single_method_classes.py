@@ -5,7 +5,7 @@ from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._usecases.check_single_method_classes import (
+from lint_rules._usecases.classes.check_single_method_classes import (
     check_single_method_classes,
 )
 

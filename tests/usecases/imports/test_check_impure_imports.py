@@ -2,7 +2,7 @@ from fake_project import Project, case, check
 
 from lint_rules._core.imports.impure_import_violation import ImpureImportViolation
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._usecases.check_impure_imports import check_impure_imports
+from lint_rules._usecases.imports.check_impure_imports import check_impure_imports
 
 
 def test_impure_imports(subtests):

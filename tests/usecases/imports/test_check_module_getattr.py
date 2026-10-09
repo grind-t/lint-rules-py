@@ -1,7 +1,7 @@
 from fake_project import Project, case, check
 
 from lint_rules._core.reexports.module_getattr_violation import ModuleGetattrViolation
-from lint_rules._usecases.check_module_getattr import check_module_getattr
+from lint_rules._usecases.reexports.check_module_getattr import check_module_getattr
 
 
 def test_module_getattr(subtests):

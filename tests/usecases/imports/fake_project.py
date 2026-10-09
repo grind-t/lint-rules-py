@@ -5,7 +5,8 @@ from typing import Self
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
-from lint_rules._usecases.check_source_files import Check, StatefulCheck
+from lint_rules._usecases.stateful_check import StatefulCheck
+from lint_rules._usecases.stateless_check import StatelessCheck
 
 
 class Project:
@@ -55,7 +56,7 @@ class Project:
 
 
 def check_files(
-    files: Iterable[ParsedFile], rule: Check | StatefulCheck
+    files: Iterable[ParsedFile], rule: StatelessCheck | StatefulCheck
 ) -> list[Violation]:
     """Run only this rule on the files."""
     if isinstance(rule, StatefulCheck):
@@ -65,7 +66,7 @@ def check_files(
     return [violation for file in files for violation in rule(file)]
 
 
-def check(project: Project, rule: Check | StatefulCheck) -> list[Violation]:
+def check(project: Project, rule: StatelessCheck | StatefulCheck) -> list[Violation]:
     """Violations of the checked file; other files only give context.
 
     The order of violations is unspecified, so a case expects at most one.
