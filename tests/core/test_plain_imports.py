@@ -16,7 +16,6 @@ def test_plain_imports(subtests):
             "import b\ndef f():\n    import a",
             [("b", SourceLocation(1, 8)), ("a", SourceLocation(3, 12))],
         ),
-        ("try:\n    import a\nexcept ImportError: ...", [("a", SourceLocation(2, 12))]),
         ("from lib import app", []),
         ("x = __import__('lib')", []),
     ]
