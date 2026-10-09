@@ -2,6 +2,8 @@ from collections.abc import Iterable
 from textwrap import dedent
 from typing import Self
 
+import pytest
+
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
@@ -55,7 +57,7 @@ class Project:
         return name.replace(".", "/") + ".py"
 
 
-def check_files(
+def _check_files(
     files: Iterable[ParsedFile], rule: StatelessCheck | StatefulCheck
 ) -> list[Violation]:
     """Run only this rule on the files."""
@@ -66,17 +68,30 @@ def check_files(
     return [violation for file in files for violation in rule(file)]
 
 
-def check(project: Project, rule: StatelessCheck | StatefulCheck) -> list[Violation]:
+def _check(project: Project, rule: StatelessCheck | StatefulCheck) -> list[Violation]:
     """Violations of the checked file; other files only give context.
 
     The order of violations is unspecified, so a case expects at most one.
     """
     assert project.checked_path, "the project has no checked file"
-    violations = check_files(project.to_files(), rule)
+    violations = _check_files(project.to_files(), rule)
     return [v for v in violations if v.path == project.checked_path]
 
 
-def case(
+def _case(
     description: str, project: Project, *, expected: list[Violation]
 ) -> tuple[str, Project, list[Violation]]:
     return description, project, expected
+
+
+class FakeProject:
+    """What the tests of the imports rules need, as one fixture."""
+
+    project = Project
+    check = staticmethod(_check)
+    case = staticmethod(_case)
+
+
+@pytest.fixture
+def fake_project() -> FakeProject:
+    return FakeProject()

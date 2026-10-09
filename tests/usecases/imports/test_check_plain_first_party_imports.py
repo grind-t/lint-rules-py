@@ -1,5 +1,3 @@
-from fake_project import Project, case, check
-
 from lint_rules._core.imports.plain_first_party_import_violation import (
     PlainFirstPartyImportViolation,
 )
@@ -9,20 +7,20 @@ from lint_rules._usecases.imports.check_plain_first_party_imports import (
 )
 
 
-def test_plain_first_party_import(subtests):
+def test_plain_first_party_import(subtests, fake_project):
     cases = [
-        case(
+        fake_project.case(
             "reports root package",
-            Project().package("lib").check_module("lib.app", "import lib"),
+            fake_project.project().package("lib").check_module("lib.app", "import lib"),
             expected=[
                 PlainFirstPartyImportViolation(
                     "src/lib/app.py", SourceLocation(1, 8), module="lib"
                 )
             ],
         ),
-        case(
+        fake_project.case(
             "reports import visited before its module is defined",
-            Project().check_module("app", "import lib").package("lib"),
+            fake_project.project().check_module("app", "import lib").package("lib"),
             expected=[
                 PlainFirstPartyImportViolation(
                     "src/app.py", SourceLocation(1, 8), module="lib"
@@ -30,21 +28,25 @@ def test_plain_first_party_import(subtests):
             ],
         ),
         # Not importable, but still checked.
-        case(
+        fake_project.case(
             "checks file without module name",
-            Project().package("lib").check_file("my-dir/x.py", "import lib"),
+            fake_project.project()
+            .package("lib")
+            .check_file("my-dir/x.py", "import lib"),
             expected=[
                 PlainFirstPartyImportViolation(
                     "src/my-dir/x.py", SourceLocation(1, 8), module="lib"
                 )
             ],
         ),
-        case(
+        fake_project.case(
             "passes third-party module",
-            Project().check_module("app", "import os"),
+            fake_project.project().check_module("app", "import os"),
             expected=[],
         ),
     ]
     for description, project, expected in cases:
         with subtests.test(description):
-            assert check(project, CheckPlainFirstPartyImports()) == expected
+            assert (
+                fake_project.check(project, CheckPlainFirstPartyImports()) == expected
+            )

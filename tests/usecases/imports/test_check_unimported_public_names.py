@@ -1,5 +1,3 @@
-from fake_project import Project, case, check
-
 from lint_rules._core.names.unimported_public_name_violation import (
     UnimportedPublicNameViolation,
 )
@@ -9,49 +7,49 @@ from lint_rules._usecases.names.check_unimported_public_names import (
 )
 
 
-def test_check_unimported_public_names(subtests):
+def test_check_unimported_public_names(subtests, fake_project):
     cases = [
-        case(
+        fake_project.case(
             "passes name imported by another module",
-            Project()
+            fake_project.project()
             .module("lib.b", "from lib.a import run")
             .check_module("lib.a", "def run(): ..."),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes name re-exported in a top-level package",
-            Project()
+            fake_project.project()
             .package("lib", "from lib.a import run")
             .check_module("lib.a", "def run(): ..."),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes private name",
-            Project().check_module("lib.a", "def _run(): ..."),
+            fake_project.project().check_module("lib.a", "def _run(): ..."),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes code in a top-level package",
-            Project().check_package("lib", "def run(): ..."),
+            fake_project.project().check_package("lib", "def run(): ..."),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes imported name",
-            Project().check_module("lib.a", "from lib.b import run"),
+            fake_project.project().check_module("lib.a", "from lib.b import run"),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "reports name used only in its module",
-            Project().check_module("lib.a", "def run(): ...\nrun()"),
+            fake_project.project().check_module("lib.a", "def run(): ...\nrun()"),
             expected=[
                 UnimportedPublicNameViolation(
                     "src/lib/a.py", SourceLocation(1, 1), name="run"
                 )
             ],
         ),
-        case(
+        fake_project.case(
             "reports name imported from another module of the same name",
-            Project()
+            fake_project.project()
             .module("lib.b", "from lib.c import run")
             .check_module("lib.a", "def run(): ..."),
             expected=[
@@ -60,9 +58,9 @@ def test_check_unimported_public_names(subtests):
                 )
             ],
         ),
-        case(
+        fake_project.case(
             "reports variable",
-            Project().check_module("lib.a", "LIMIT = 1"),
+            fake_project.project().check_module("lib.a", "LIMIT = 1"),
             expected=[
                 UnimportedPublicNameViolation(
                     "src/lib/a.py", SourceLocation(1, 1), name="LIMIT"
@@ -72,4 +70,4 @@ def test_check_unimported_public_names(subtests):
     ]
     for description, project, expected in cases:
         with subtests.test(description):
-            assert check(project, CheckUnimportedPublicNames()) == expected
+            assert fake_project.check(project, CheckUnimportedPublicNames()) == expected

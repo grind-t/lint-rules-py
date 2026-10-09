@@ -1,15 +1,15 @@
-from fake_project import Project, case, check
-
 from lint_rules._core.imports.impure_import_violation import ImpureImportViolation
 from lint_rules._core.source.source_location import SourceLocation
 from lint_rules._usecases.imports.check_impure_imports import check_impure_imports
 
 
-def test_impure_imports(subtests):
+def test_impure_imports(subtests, fake_project):
     cases = [
-        case(
+        fake_project.case(
             "reports impure name in a no-I/O layer",
-            Project().check_file("pkg/_core/a.py", "from pathlib import Path"),
+            fake_project.project().check_file(
+                "pkg/_core/a.py", "from pathlib import Path"
+            ),
             expected=[
                 ImpureImportViolation(
                     "src/pkg/_core/a.py",
@@ -18,9 +18,11 @@ def test_impure_imports(subtests):
                 )
             ],
         ),
-        case(
+        fake_project.case(
             "reports plain import in a no-I/O layer",
-            Project().check_file("pkg/_usecases/a.py", "import subprocess"),
+            fake_project.project().check_file(
+                "pkg/_usecases/a.py", "import subprocess"
+            ),
             expected=[
                 ImpureImportViolation(
                     "src/pkg/_usecases/a.py",
@@ -29,17 +31,21 @@ def test_impure_imports(subtests):
                 )
             ],
         ),
-        case(
+        fake_project.case(
             "passes pure name in a no-I/O layer",
-            Project().check_file("pkg/_core/a.py", "from pathlib import PurePosixPath"),
+            fake_project.project().check_file(
+                "pkg/_core/a.py", "from pathlib import PurePosixPath"
+            ),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes impure name in an adapter",
-            Project().check_file("pkg/_adapters/a.py", "from pathlib import Path"),
+            fake_project.project().check_file(
+                "pkg/_adapters/a.py", "from pathlib import Path"
+            ),
             expected=[],
         ),
     ]
     for description, project, expected in cases:
         with subtests.test(description):
-            assert check(project, check_impure_imports) == expected
+            assert fake_project.check(project, check_impure_imports) == expected

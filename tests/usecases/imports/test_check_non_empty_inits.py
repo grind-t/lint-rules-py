@@ -1,47 +1,49 @@
-from fake_project import Project, case, check
-
 from lint_rules._core.reexports.non_empty_init_violation import NonEmptyInitViolation
 from lint_rules._usecases.reexports.check_non_empty_inits import check_non_empty_inits
 
 
-def test_non_empty_inits(subtests):
+def test_non_empty_inits(subtests, fake_project):
     cases = [
-        case(
+        fake_project.case(
             "passes re-export in top-level package",
-            Project().check_package("lib", "from lib.app import run"),
+            fake_project.project().check_package("lib", "from lib.app import run"),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes re-export in another top-level package",
-            Project().package("lib").check_package("other", "from lib.app import run"),
+            fake_project.project()
+            .package("lib")
+            .check_package("other", "from lib.app import run"),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes empty nested package",
-            Project().package("lib").check_package("lib.core", ""),
+            fake_project.project().package("lib").check_package("lib.core", ""),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "passes comment-only nested package",
-            Project().check_package("lib.core", "# nothing here"),
+            fake_project.project().check_package("lib.core", "# nothing here"),
             expected=[],
         ),
-        case(
+        fake_project.case(
             "reports re-export in nested package",
-            Project().check_package("lib.core", "from lib.core.app import run"),
+            fake_project.project().check_package(
+                "lib.core", "from lib.core.app import run"
+            ),
             expected=[NonEmptyInitViolation("src/lib/core/__init__.py")],
         ),
-        case(
+        fake_project.case(
             "reports docstring in nested package",
-            Project().check_package("lib.core", '"""Core."""'),
+            fake_project.project().check_package("lib.core", '"""Core."""'),
             expected=[NonEmptyInitViolation("src/lib/core/__init__.py")],
         ),
-        case(
+        fake_project.case(
             "passes code in a module",
-            Project().check_module("lib.core.app", "x = 1"),
+            fake_project.project().check_module("lib.core.app", "x = 1"),
             expected=[],
         ),
     ]
     for description, project, expected in cases:
         with subtests.test(description):
-            assert check(project, check_non_empty_inits) == expected
+            assert fake_project.check(project, check_non_empty_inits) == expected
