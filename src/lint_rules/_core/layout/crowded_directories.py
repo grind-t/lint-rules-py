@@ -21,4 +21,4 @@ def crowded_directories(paths: Iterable[str], limit: int) -> list[tuple[str, int
         and not path.endswith(f"/{_PACKAGE_INIT}")
         and path != _PACKAGE_INIT
     )
-    return sorted((d, n) for d, n in counts.items() if n > limit)
+    return [(d, n) for d, n in counts.items() if n > limit]
