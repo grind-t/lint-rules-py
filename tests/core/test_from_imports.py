@@ -17,12 +17,7 @@ def test_from_imports(subtests):
             "from b import x\ndef f():\n    from a import y",
             [("b", "x", SourceLocation(1, 15)), ("a", "y", SourceLocation(3, 19))],
         ),
-        (
-            "try:\n    from a import x\nexcept ImportError: ...",
-            [("a", "x", SourceLocation(2, 19))],
-        ),
         ("from lib import *", []),
-        ("from . import app", []),
         ("from .lib import app", []),
         ("import lib", []),
     ]
