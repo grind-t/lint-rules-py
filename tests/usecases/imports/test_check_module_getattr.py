@@ -1,20 +1,39 @@
 from lint_rules._core.reexports.module_getattr_violation import ModuleGetattrViolation
 from lint_rules._usecases.reexports.check_module_getattr import check_module_getattr
 
+_BINDING_FORMS = [
+    "def __getattr__(name): ...",
+    "__getattr__ = _lazy",
+    "from lib import __getattr__",
+    "for __getattr__ in hooks: ...",
+    "if x:\n    def __getattr__(name): ...",
+]
+
+# Methods and nested functions do not bind a module attribute. __dir__ only
+# affects dir() and adds no names.
+_NON_BINDING_FORMS = [
+    "print(__getattr__)",
+    "class C:\n    def __getattr__(self, name): ...",
+    "def f():\n    def __getattr__(name): ...",
+    "def __dir__(): ...",
+]
+
 
 def test_module_getattr(subtests, fake_project):
     cases = [
         fake_project.case(
-            "reports def __getattr__",
-            fake_project.project().check_module("app", "def __getattr__(name): ..."),
+            f"reports {source!r}",
+            fake_project.project().check_module("app", source),
             expected=[ModuleGetattrViolation("src/app.py")],
-        ),
-        # __dir__ only affects dir() and adds no names.
+        )
+        for source in _BINDING_FORMS
+    ] + [
         fake_project.case(
-            "passes __dir__",
-            fake_project.project().check_module("app", "def __dir__(): ..."),
+            f"passes {source!r}",
+            fake_project.project().check_module("app", source),
             expected=[],
-        ),
+        )
+        for source in _NON_BINDING_FORMS
     ]
     for description, project, expected in cases:
         with subtests.test(description):
