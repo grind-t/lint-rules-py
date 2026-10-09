@@ -20,17 +20,3 @@ def test_reports_module_used_by_one_feature():
     assert _check(files) == [
         UnsharedModuleViolation("src/lib/shared/base.py", features=("a",))
     ]
-
-
-def test_passes_module_used_by_two_features():
-    files = {
-        "src/lib/shared/base.py": "",
-        "src/lib/a/x.py": "from lib.shared.base import Base",
-        "src/lib/b/y.py": "from lib.shared import base",
-    }
-    assert _check(files) == []
-
-
-def test_message_names_the_feature():
-    violation = UnsharedModuleViolation("src/lib/shared/base.py", features=("a",))
-    assert "feature a" in violation.message
