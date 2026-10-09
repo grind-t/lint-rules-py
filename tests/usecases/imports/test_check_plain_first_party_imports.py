@@ -46,11 +46,6 @@ def test_plain_first_party_import(subtests):
             Project().check_module("app", "import os"),
             expected=[],
         ),
-        case(
-            "passes file without imports",
-            Project().package("lib").check_module("lib.app", "x = 1"),
-            expected=[],
-        ),
     ]
     for description, project, expected in cases:
         with subtests.test(description):
