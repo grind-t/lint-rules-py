@@ -90,10 +90,3 @@ layers = [
     "lint_rules._ports",
     "lint_rules._core",
 ]
-
-[[tool.importlinter.contracts]]
-name = "Core, ports and use cases do no I/O"
-type = "forbidden"
-source_modules = ["lint_rules._core", "lint_rules._ports", "lint_rules._usecases"]
-# also add adapters' third-party dependencies here (httpx, etc.)
-forbidden_modules = ["os", "io", "pathlib", "socket", "subprocess"]

@@ -8,6 +8,9 @@ from lint_rules._usecases.check_crowded_directories import CheckCrowdedDirectori
 from lint_rules._usecases.check_first_party_module_from_imports import (
     CheckFirstPartyModuleFromImports,
 )
+from lint_rules._usecases.check_impure_imports import (
+    check_impure_imports,
+)
 from lint_rules._usecases.check_module_getattr import check_module_getattr
 from lint_rules._usecases.check_plain_first_party_imports import (
     CheckPlainFirstPartyImports,
@@ -37,6 +40,7 @@ _CHECKS: tuple[Check, ...] = (
     check_public_classes,
     check_single_method_classes,
     check_module_getattr,
+    check_impure_imports,
 )
 
 _STATEFUL_CHECKS: tuple[Callable[[str], StatefulCheck], ...] = (
