@@ -10,7 +10,7 @@ def _check(modules: int):
     paths = [f"src/lib/m{i}.py" for i in range(modules)]
     check = CheckCrowdedDirectories()
     for path in paths:
-        check.visit(ParsedFile(SourceFile(path, "")))
+        check.visit(ParsedFile(SourceFile("src", path, "")))
     return check.finish()
 
 

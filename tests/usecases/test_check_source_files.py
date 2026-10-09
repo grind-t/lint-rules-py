@@ -4,7 +4,9 @@ from lint_rules._usecases.check_source_files import check_source_files
 
 def fake_read_files(files: dict[str, str]):
     """Port fake: any function with the right signature will do."""
-    return lambda _root: [SourceFile(path, source) for path, source in files.items()]
+    return lambda root: [
+        SourceFile(root, path, source) for path, source in files.items()
+    ]
 
 
 def test_runs_every_check_on_every_file():

@@ -7,14 +7,13 @@ from lint_rules._core.source.parsed_file import ParsedFile
 
 
 class CheckUnsharedModules:
-    def __init__(self, root: str) -> None:
-        self._root = root
+    def __init__(self) -> None:
         self._imports: dict[str, set[str]] = {}
         self._modules: dict[str, str] = {}
 
     def visit(self, file: ParsedFile) -> None:
         self._imports[file.path] = imported_modules(file.tree)
-        if name := module_name(file.path, self._root):
+        if name := module_name(file.path, file.root):
             self._modules[name] = file.path
 
     def finish(self) -> list[Violation]:

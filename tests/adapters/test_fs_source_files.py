@@ -9,8 +9,8 @@ def test_reads_python_files_recursively_in_sorted_order(tmp_path):
     (tmp_path / "notes.txt").write_text("not python\n")
 
     assert list(read_fs_source_files(str(tmp_path))) == [
-        SourceFile(str(tmp_path / "a.py"), "a = 1\n"),
-        SourceFile(str(tmp_path / "pkg" / "b.py"), "b = 1\n"),
+        SourceFile(str(tmp_path), str(tmp_path / "a.py"), "a = 1\n"),
+        SourceFile(str(tmp_path), str(tmp_path / "pkg" / "b.py"), "b = 1\n"),
     ]
 
 
@@ -18,5 +18,5 @@ def test_decodes_utf8(tmp_path):
     (tmp_path / "a.py").write_bytes("s = 'привет'\n".encode())
 
     assert list(read_fs_source_files(str(tmp_path))) == [
-        SourceFile(str(tmp_path / "a.py"), "s = 'привет'\n"),
+        SourceFile(str(tmp_path), str(tmp_path / "a.py"), "s = 'привет'\n"),
     ]

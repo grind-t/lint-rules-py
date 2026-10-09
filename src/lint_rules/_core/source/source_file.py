@@ -5,5 +5,6 @@ from dataclasses import dataclass
 class SourceFile:
     """A Python file as read."""
 
+    root: str
     path: str
     source: str

@@ -12,6 +12,7 @@ from lint_rules._usecases.check_impure_imports import (
     check_impure_imports,
 )
 from lint_rules._usecases.check_module_getattr import check_module_getattr
+from lint_rules._usecases.check_non_empty_inits import check_non_empty_inits
 from lint_rules._usecases.check_plain_first_party_imports import (
     CheckPlainFirstPartyImports,
 )
@@ -42,12 +43,13 @@ _CHECKS: tuple[Check, ...] = (
     check_single_method_classes,
     check_module_getattr,
     check_impure_imports,
+    check_non_empty_inits,
 )
 
-_STATEFUL_CHECKS: tuple[Callable[[str], StatefulCheck], ...] = (
+_STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (
     CheckPlainFirstPartyImports,
     CheckFirstPartyModuleFromImports,
-    lambda _root: CheckCrowdedDirectories(),
+    CheckCrowdedDirectories,
     CheckUnsharedModules,
 )
 
@@ -58,7 +60,7 @@ def check_source_files(read_files: ReadSourceFiles, root: str) -> list[Violation
     Per-file checks report as each file is read; stateful checks start fresh
     on every call and report after the last file.
     """
-    stateful = [make(root) for make in _STATEFUL_CHECKS]
+    stateful = [make() for make in _STATEFUL_CHECKS]
     violations = []
     for source_file in read_files(root):
         file = ParsedFile(source_file)

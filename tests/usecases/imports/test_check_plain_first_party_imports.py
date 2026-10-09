@@ -47,4 +47,4 @@ def test_plain_first_party_import(subtests):
     ]
     for description, project, expected in cases:
         with subtests.test(description):
-            assert check(project, CheckPlainFirstPartyImports("src")) == expected
+            assert check(project, CheckPlainFirstPartyImports()) == expected
