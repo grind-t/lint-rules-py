@@ -57,11 +57,11 @@ def check_files(
     files: Iterable[ParsedFile], rule: Check | StatefulCheck
 ) -> list[Violation]:
     """Run only this rule on the files."""
-    if callable(rule):
-        return [violation for file in files for violation in rule(file)]
-    for file in files:
-        rule.visit(file)
-    return rule.finish()
+    if isinstance(rule, StatefulCheck):
+        for file in files:
+            rule.visit(file)
+        return rule.finish()
+    return [violation for file in files for violation in rule(file)]
 
 
 def check(project: Project, rule: Check | StatefulCheck) -> list[Violation]:

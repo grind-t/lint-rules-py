@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
@@ -24,6 +24,7 @@ from lint_rules._usecases.check_unshared_modules import CheckUnsharedModules
 type Check = Callable[[ParsedFile], list[Violation]]
 
 
+@runtime_checkable
 class StatefulCheck(Protocol):
     """A check that needs every file before it can report, e.g. across files."""
 
