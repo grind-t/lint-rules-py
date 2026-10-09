@@ -1,8 +1,9 @@
 from collections import defaultdict
 from collections.abc import Mapping, Set
 
+from lint_rules._core.shared.package_init import is_package_init
+
 _SHARED = "shared"
-_PACKAGE_INIT = "__init__.py"
 
 
 def _owner(path: str) -> str | None:
@@ -59,7 +60,7 @@ def unshared_modules(
     found = []
     for path in sorted(imports):
         owner = _owner(path)
-        if owner is None or path.endswith(f"/{_PACKAGE_INIT}"):
+        if owner is None or is_package_init(path):
             continue
         features = _features_using(path, owner, importers)
         if len(features) < 2:

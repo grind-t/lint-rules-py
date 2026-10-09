@@ -1,7 +1,7 @@
 from collections import Counter
 from collections.abc import Iterable
 
-_PACKAGE_INIT = "__init__.py"
+from lint_rules._core.shared.package_init import is_package_init
 
 
 def _directory(path: str) -> str:
@@ -17,8 +17,6 @@ def crowded_directories(paths: Iterable[str], limit: int) -> list[tuple[str, int
     counts = Counter(
         _directory(path)
         for path in paths
-        if path.endswith(".py")
-        and not path.endswith(f"/{_PACKAGE_INIT}")
-        and path != _PACKAGE_INIT
+        if path.endswith(".py") and not is_package_init(path)
     )
     return [(d, n) for d, n in counts.items() if n > limit]

@@ -1,6 +1,6 @@
 from pathlib import PurePosixPath
 
-_PACKAGE_INIT = "__init__.py"
+from lint_rules._core.shared.package_init import PACKAGE_INIT
 
 
 def top_level_module(path: str, root: str) -> str | None:
@@ -14,8 +14,8 @@ def top_level_module(path: str, root: str) -> str | None:
     if not file.is_relative_to(root):
         return None
     match file.relative_to(root).parts:
-        case [module] if module.endswith(".py") and module != _PACKAGE_INIT:
+        case [module] if module.endswith(".py") and module != PACKAGE_INIT:
             return module.removesuffix(".py")
-        case [package, init] if init == _PACKAGE_INIT:
+        case [package, init] if init == PACKAGE_INIT:
             return package
     return None

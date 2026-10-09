@@ -1,4 +1,4 @@
-_PACKAGE_INIT = "__init__.py"
+from lint_rules._core.shared.package_init import PACKAGE_INIT
 
 
 def module_name(path: str, root: str) -> str | None:
@@ -12,6 +12,6 @@ def module_name(path: str, root: str) -> str | None:
     if not path.startswith(prefix) or not path.endswith(".py"):
         return None
     parts = path.removeprefix(prefix).removesuffix(".py").split("/")
-    if parts[-1] == _PACKAGE_INIT.removesuffix(".py"):
+    if parts[-1] == PACKAGE_INIT.removesuffix(".py"):
         parts.pop()
     return ".".join(parts) or None

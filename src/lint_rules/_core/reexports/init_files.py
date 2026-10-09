@@ -1,6 +1,6 @@
 from pathlib import PurePosixPath
 
-_PACKAGE_INIT = "__init__.py"
+from lint_rules._core.shared.package_init import PACKAGE_INIT
 
 
 def is_top_level_init(path: str, root: str) -> bool:
@@ -13,5 +13,5 @@ def is_top_level_init(path: str, root: str) -> bool:
         return False
     match file.relative_to(root).parts:
         case [init] | [_, init]:
-            return init == _PACKAGE_INIT
+            return init == PACKAGE_INIT
     return False
