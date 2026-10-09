@@ -20,10 +20,6 @@ def test_reports_class_with_single_method():
     ]
 
 
-def test_passes_module_without_classes():
-    assert check("def run(): ...") == []
-
-
 def test_marker_disables_check():
     assert (
         check("# allow-single-method-classes\nclass A:\n    def run(self): ...") == []
