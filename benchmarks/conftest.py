@@ -19,6 +19,21 @@ def _make_module(n_classes: int, methods_per_class: int = 2) -> str:
     return "\n".join(lines)
 
 
+def _make_imports(n_imports: int) -> str:
+    """Module of ``n_imports`` of each: plain, from and impure imports."""
+    lines = []
+    for i in range(n_imports):
+        lines.append(f"import pkg{i}.sub")
+        lines.append(f"from pkg{i} import a{i}, b{i}")
+        lines.append(f"from os import getcwd as g{i}")
+    return "\n".join(lines)
+
+
+@pytest.fixture(scope="session")
+def make_imports() -> Callable[..., str]:
+    return _make_imports
+
+
 @pytest.fixture(scope="session")
 def make_module() -> Callable[..., str]:
     return _make_module
