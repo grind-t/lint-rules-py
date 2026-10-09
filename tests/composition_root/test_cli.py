@@ -1,6 +1,6 @@
 import pytest
 
-from lint_rules._wiring.cli import main
+from lint_rules._composition_root.cli import main
 
 
 def test_checks_the_given_root(tmp_path, capsys):

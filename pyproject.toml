@@ -18,7 +18,7 @@ Homepage = "https://github.com/grind-t/lint-rules-py"
 Issues = "https://github.com/grind-t/lint-rules-py/issues"
 
 [project.scripts]
-lint-rules = "lint_rules._wiring.cli:main"
+lint-rules = "lint_rules._composition_root.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.12.9,<0.13.0"]
@@ -84,7 +84,7 @@ include_external_packages = true
 name = "Layers: dependencies point inward only"
 type = "layers"
 layers = [
-    "lint_rules._wiring",
+    "lint_rules._composition_root",
     "lint_rules._adapters | lint_rules._usecases",
     "lint_rules._ports",
     "lint_rules._core",

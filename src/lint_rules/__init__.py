@@ -1,4 +1,4 @@
+from lint_rules._composition_root.cli import main
 from lint_rules._core.shared.violation import Violation
-from lint_rules._wiring.cli import main
 
 __all__ = ["Violation", "main"]
