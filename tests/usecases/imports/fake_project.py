@@ -41,8 +41,7 @@ class Project:
 
     def to_files(self) -> list[ParsedFile]:
         return [
-            ParsedFile(SourceFile("src", path, source))
-            for path, source in self.files.items()
+            ParsedFile(SourceFile(path, source)) for path, source in self.files.items()
         ]
 
     @staticmethod

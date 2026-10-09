@@ -1,10 +1,8 @@
-from fake_project import Project, case, check, check_files
+from fake_project import Project, case, check
 
 from lint_rules._core.imports.plain_first_party_import_violation import (
     PlainFirstPartyImportViolation,
 )
-from lint_rules._core.source.parsed_file import ParsedFile
-from lint_rules._core.source.source_file import SourceFile
 from lint_rules._core.source.source_location import SourceLocation
 from lint_rules._usecases.check_plain_first_party_imports import (
     CheckPlainFirstPartyImports,
@@ -49,18 +47,4 @@ def test_plain_first_party_import(subtests):
     ]
     for description, project, expected in cases:
         with subtests.test(description):
-            assert check(project, CheckPlainFirstPartyImports()) == expected
-
-
-def test_top_level_modules_of_every_root():
-    files = [
-        SourceFile("tests", "tests/conftest.py", ""),
-        SourceFile("src", "src/lib/x.py", "import conftest"),
-    ]
-    assert check_files(
-        [ParsedFile(f) for f in files], CheckPlainFirstPartyImports()
-    ) == [
-        PlainFirstPartyImportViolation(
-            "src/lib/x.py", SourceLocation(1, 8), module="conftest"
-        )
-    ]
+            assert check(project, CheckPlainFirstPartyImports("src")) == expected

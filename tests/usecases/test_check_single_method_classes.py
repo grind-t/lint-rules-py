@@ -11,7 +11,7 @@ from lint_rules._usecases.check_single_method_classes import (
 
 
 def check(source: str) -> list[Violation]:
-    return check_single_method_classes(ParsedFile(SourceFile(".", "a.py", source)))
+    return check_single_method_classes(ParsedFile(SourceFile("a.py", source)))
 
 
 def test_reports_class_with_single_method():

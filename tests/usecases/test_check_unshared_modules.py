@@ -5,9 +5,9 @@ from lint_rules._usecases.check_unshared_modules import CheckUnsharedModules
 
 
 def _check(files: dict[str, str]):
-    check = CheckUnsharedModules()
+    check = CheckUnsharedModules("src")
     for path, source in files.items():
-        check.visit(ParsedFile(SourceFile("src", path, source)))
+        check.visit(ParsedFile(SourceFile(path, source)))
     return check.finish()
 
 

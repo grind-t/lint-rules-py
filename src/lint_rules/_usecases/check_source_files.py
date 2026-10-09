@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from typing import Protocol
 
 from lint_rules._core.shared.violation import Violation
@@ -39,25 +39,23 @@ _CHECKS: tuple[Check, ...] = (
     check_module_getattr,
 )
 
-_STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (
+_STATEFUL_CHECKS: tuple[Callable[[str], StatefulCheck], ...] = (
     CheckPlainFirstPartyImports,
     CheckFirstPartyModuleFromImports,
-    CheckCrowdedDirectories,
+    lambda _root: CheckCrowdedDirectories(),
     CheckUnsharedModules,
 )
 
 
-def check_source_files(
-    read_files: ReadSourceFiles, roots: Iterable[str]
-) -> list[Violation]:
+def check_source_files(read_files: ReadSourceFiles, root: str) -> list[Violation]:
     """Run every check on each file, parsing it only once.
 
     Per-file checks report as each file is read; stateful checks start fresh
     on every call and report after the last file.
     """
-    stateful = [make() for make in _STATEFUL_CHECKS]
+    stateful = [make(root) for make in _STATEFUL_CHECKS]
     violations = []
-    for source_file in read_files(roots):
+    for source_file in read_files(root):
         file = ParsedFile(source_file)
         for check in _CHECKS:
             violations.extend(check(file))

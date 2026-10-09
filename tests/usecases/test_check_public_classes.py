@@ -8,7 +8,7 @@ from lint_rules._usecases.check_public_classes import check_public_classes
 
 
 def check(source: str) -> list[Violation]:
-    return check_public_classes(ParsedFile(SourceFile(".", "a.py", source)))
+    return check_public_classes(ParsedFile(SourceFile("a.py", source)))
 
 
 def test_reports_module_with_two_public_classes():

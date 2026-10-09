@@ -10,12 +10,13 @@ from lint_rules._core.source.source_location import SourceLocation
 
 
 class CheckPlainFirstPartyImports:
-    def __init__(self) -> None:
+    def __init__(self, root: str) -> None:
+        self._root = root
         self._top_level_modules: set[str] = set()
         self._imports: list[tuple[str, str, SourceLocation]] = []
 
     def visit(self, file: ParsedFile) -> None:
-        if name := top_level_module(file.path, file.root):
+        if name := top_level_module(file.path, self._root):
             self._top_level_modules.add(name)
         self._imports.extend(
             (file.path, module, location)

@@ -82,4 +82,4 @@ def test_first_party_module_from_import(subtests):
     ]
     for description, project, expected in cases:
         with subtests.test(description):
-            assert check(project, CheckFirstPartyModuleFromImports()) == expected
+            assert check(project, CheckFirstPartyModuleFromImports("src")) == expected
