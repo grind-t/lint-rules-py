@@ -9,6 +9,7 @@ def test_binds_module_getattr(subtests):
         ("__getattr__ = _lazy", True),
         ("from lib import __getattr__", True),
         ("for __getattr__ in hooks: ...", True),
+        ("if x:\n    def __getattr__(name): ...", True),
         ("print(__getattr__)", False),
         ("class C:\n    def __getattr__(self, name): ...", False),
         ("def f():\n    def __getattr__(name): ...", False),
