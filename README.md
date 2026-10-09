@@ -19,3 +19,4 @@ lint-rules [root]   # default root: src; exit code 1 if there are violations
 | `check_first_party_module_from_imports` | `from pkg import mod` of a first-party module — use `from pkg.mod import name` |
 | `check_crowded_directories` | More than 10 modules directly in one directory |
 | `check_unshared_modules` | Modules in `shared/` used by fewer than two sibling features |
+| `check_unimported_public_names` | Public top-level names (no `_`) that no other module imports |

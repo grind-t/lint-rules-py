@@ -11,7 +11,7 @@ def test_checks_the_given_root(tmp_path, capsys):
 
 
 def test_passes_clean_root(tmp_path):
-    (tmp_path / "a.py").write_text("x = 1\n")
+    (tmp_path / "a.py").write_text("_x = 1\n")
 
     assert main([str(tmp_path)]) == 0
 

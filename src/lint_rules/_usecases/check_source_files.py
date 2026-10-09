@@ -20,6 +20,9 @@ from lint_rules._usecases.check_public_classes import check_public_classes
 from lint_rules._usecases.check_single_method_classes import (
     check_single_method_classes,
 )
+from lint_rules._usecases.check_unimported_public_names import (
+    CheckUnimportedPublicNames,
+)
 from lint_rules._usecases.check_unshared_modules import CheckUnsharedModules
 
 type Check = Callable[[ParsedFile], list[Violation]]
@@ -51,6 +54,7 @@ _STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (
     CheckFirstPartyModuleFromImports,
     CheckCrowdedDirectories,
     CheckUnsharedModules,
+    CheckUnimportedPublicNames,
 )
 
 
