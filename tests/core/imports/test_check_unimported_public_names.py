@@ -1,4 +1,4 @@
-from lint_rules._core.checks.names.check_unimported_public_names import (
+from lint_rules._core.names.check_unimported_public_names import (
     CheckUnimportedPublicNames,
 )
 from lint_rules._core.names.unimported_public_name_violation import (

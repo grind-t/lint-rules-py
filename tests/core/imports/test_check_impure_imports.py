@@ -1,4 +1,4 @@
-from lint_rules._core.checks.imports.check_impure_imports import check_impure_imports
+from lint_rules._core.imports.check_impure_imports import check_impure_imports
 from lint_rules._core.imports.impure_import_violation import ImpureImportViolation
 from lint_rules._core.source.source_location import SourceLocation
 

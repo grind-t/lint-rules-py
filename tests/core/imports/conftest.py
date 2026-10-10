@@ -4,11 +4,11 @@ from typing import Self
 
 import pytest
 
-from lint_rules._core.checks.stateful_check import StatefulCheck
-from lint_rules._core.checks.stateless_check import StatelessCheck
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile
+from lint_rules._core.stateful_check import StatefulCheck
+from lint_rules._core.stateless_check import StatelessCheck
 
 
 class Project:

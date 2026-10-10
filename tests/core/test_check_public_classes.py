@@ -1,4 +1,4 @@
-from lint_rules._core.checks.classes.check_public_classes import check_public_classes
+from lint_rules._core.classes.check_public_classes import check_public_classes
 from lint_rules._core.classes.multiple_public_classes_violation import (
     MultiplePublicClassesViolation,
 )

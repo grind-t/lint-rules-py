@@ -1,4 +1,4 @@
-from lint_rules._core.imports.first_party import is_first_party
+from lint_rules._core.imports.first_party.first_party import is_first_party
 
 
 def test_is_first_party(subtests):

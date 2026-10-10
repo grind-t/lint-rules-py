@@ -1,9 +1,9 @@
-from lint_rules._core.imports.first_party import is_first_party
-from lint_rules._core.imports.first_party_module_from_import_violation import (
+from lint_rules._core.imports.first_party.first_party import is_first_party
+from lint_rules._core.imports.first_party.module_from_import_violation import (
     FirstPartyModuleFromImportViolation,
 )
+from lint_rules._core.imports.first_party.top_level_module import top_level_module
 from lint_rules._core.imports.from_imports import from_imports
-from lint_rules._core.imports.top_level_module import top_level_module
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.module_name import module_name
 from lint_rules._core.source.parsed_file import ParsedFile

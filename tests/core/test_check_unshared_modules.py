@@ -1,4 +1,4 @@
-from lint_rules._core.checks.layout.check_unshared_modules import CheckUnsharedModules
+from lint_rules._core.layout.check_unshared_modules import CheckUnsharedModules
 from lint_rules._core.layout.unshared_module_violation import UnsharedModuleViolation
 from lint_rules._core.source.parsed_file import ParsedFile
 from lint_rules._core.source.source_file import SourceFile

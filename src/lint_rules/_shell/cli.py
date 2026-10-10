@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from lint_rules._core.checks.check_source_files import check_source_files
+from lint_rules._core.check_source_files import check_source_files
 from lint_rules._shell.fs_source_files import read_fs_source_files
 
 

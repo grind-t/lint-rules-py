@@ -1,4 +1,4 @@
-from lint_rules._core.imports.top_level_module import top_level_module
+from lint_rules._core.imports.first_party.top_level_module import top_level_module
 
 
 def test_top_level_module(subtests):

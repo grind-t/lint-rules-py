@@ -1,4 +1,4 @@
-from lint_rules._core.checks.classes.check_single_method_classes import (
+from lint_rules._core.classes.check_single_method_classes import (
     check_single_method_classes,
 )
 from lint_rules._core.classes.single_method_class_violation import (

@@ -1,4 +1,4 @@
-from lint_rules._core.checks.layout.check_crowded_directories import (
+from lint_rules._core.layout.check_crowded_directories import (
     CheckCrowdedDirectories,
 )
 from lint_rules._core.layout.crowded_directory_violation import (

@@ -1,7 +1,7 @@
-from lint_rules._core.checks.imports.check_plain_first_party_imports import (
+from lint_rules._core.imports.first_party.check_plain_first_party_imports import (
     CheckPlainFirstPartyImports,
 )
-from lint_rules._core.imports.plain_first_party_import_violation import (
+from lint_rules._core.imports.first_party.plain_import_violation import (
     PlainFirstPartyImportViolation,
 )
 from lint_rules._core.source.source_location import SourceLocation
