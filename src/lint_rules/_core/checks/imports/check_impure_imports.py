@@ -3,7 +3,7 @@ from lint_rules._core.imports.impure_imports import impure_imports
 from lint_rules._core.shared.violation import Violation
 from lint_rules._core.source.parsed_file import ParsedFile
 
-_NO_IO_LAYERS = frozenset({"_core", "_ports", "_usecases"})
+_NO_IO_LAYERS = frozenset({"_core"})
 
 
 def check_impure_imports(file: ParsedFile) -> list[Violation]:

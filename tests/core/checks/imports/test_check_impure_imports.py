@@ -1,6 +1,6 @@
+from lint_rules._core.checks.imports.check_impure_imports import check_impure_imports
 from lint_rules._core.imports.impure_import_violation import ImpureImportViolation
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._usecases.imports.check_impure_imports import check_impure_imports
 
 
 def test_impure_imports(subtests, fake_project):
@@ -20,12 +20,10 @@ def test_impure_imports(subtests, fake_project):
         ),
         fake_project.case(
             "reports plain import in a no-I/O layer",
-            fake_project.project().check_file(
-                "pkg/_usecases/a.py", "import subprocess"
-            ),
+            fake_project.project().check_file("pkg/_core/a.py", "import subprocess"),
             expected=[
                 ImpureImportViolation(
-                    "src/pkg/_usecases/a.py",
+                    "src/pkg/_core/a.py",
                     SourceLocation(1, 8),
                     statement="import subprocess",
                 )
@@ -39,9 +37,9 @@ def test_impure_imports(subtests, fake_project):
             expected=[],
         ),
         fake_project.case(
-            "passes impure name in an adapter",
+            "passes impure name in the shell",
             fake_project.project().check_file(
-                "pkg/_adapters/a.py", "from pathlib import Path"
+                "pkg/_shell/a.py", "from pathlib import Path"
             ),
             expected=[],
         ),

@@ -1,10 +1,10 @@
+from lint_rules._core.checks.imports.check_plain_first_party_imports import (
+    CheckPlainFirstPartyImports,
+)
 from lint_rules._core.imports.plain_first_party_import_violation import (
     PlainFirstPartyImportViolation,
 )
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._usecases.imports.check_plain_first_party_imports import (
-    CheckPlainFirstPartyImports,
-)
 
 
 def test_plain_first_party_import(subtests, fake_project):

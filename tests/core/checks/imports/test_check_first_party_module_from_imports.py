@@ -1,10 +1,10 @@
+from lint_rules._core.checks.imports.check_first_party_module_from_imports import (
+    CheckFirstPartyModuleFromImports,
+)
 from lint_rules._core.imports.first_party_module_from_import_violation import (
     FirstPartyModuleFromImportViolation,
 )
 from lint_rules._core.source.source_location import SourceLocation
-from lint_rules._usecases.imports.check_first_party_module_from_imports import (
-    CheckFirstPartyModuleFromImports,
-)
 
 
 def lib(fake_project):

@@ -1,5 +1,7 @@
+from lint_rules._core.checks.reexports.check_non_empty_inits import (
+    check_non_empty_inits,
+)
 from lint_rules._core.reexports.non_empty_init_violation import NonEmptyInitViolation
-from lint_rules._usecases.reexports.check_non_empty_inits import check_non_empty_inits
 
 
 def test_non_empty_inits(subtests, fake_project):

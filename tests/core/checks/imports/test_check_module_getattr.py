@@ -1,5 +1,5 @@
+from lint_rules._core.checks.reexports.check_module_getattr import check_module_getattr
 from lint_rules._core.reexports.module_getattr_violation import ModuleGetattrViolation
-from lint_rules._usecases.reexports.check_module_getattr import check_module_getattr
 
 _BINDING_FORMS = [
     "def __getattr__(name): ...",
