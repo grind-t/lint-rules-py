@@ -46,7 +46,7 @@ ban-relative-imports = "all"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = ["--import-mode=importlib", "--strict-markers", "--strict-config", "-ra"]
+addopts = ["--import-mode=importlib", "--strict-markers", "--strict-config", "-ra", "-q"]
 xfail_strict = true
 filterwarnings = ["error"]
 
@@ -54,7 +54,7 @@ filterwarnings = ["error"]
 fmt = "ruff format"
 lint = [
     { cmd = "ruff check" },
-    { cmd = "lint-imports" },
+    { cmd = "lint-imports --no-logo" },
     { cmd = "lint-rules src" },
 ]
 typecheck = "ty check"
