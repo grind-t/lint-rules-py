@@ -7,12 +7,8 @@ from lint_rules._stateless_computations.ast_single_method_classes import (
     ast_single_method_classes,
 )
 
-_MARKER = "# allow-single-method-classes"
-
 
 def check_single_method_classes(file: ParsedFile) -> list[Violation]:
-    if _MARKER in file.source:
-        return []
     return [
         ViolationSingleMethodClass(file.path, location, cls=cls, method=method)
         for cls, method, location in ast_single_method_classes(file.tree)

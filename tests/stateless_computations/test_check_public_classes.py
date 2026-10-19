@@ -19,7 +19,3 @@ def test_reports_module_with_two_public_classes():
 
 def test_passes_module_with_one_public_class():
     assert check("class A: ...") == []
-
-
-def test_marker_disables_check():
-    assert check("# allow-multiple-public-classes\nclass A: ...\nclass B: ...") == []

@@ -12,6 +12,9 @@ from lint_rules._stateful_computations.check_unimported_public_names import (
     CheckUnimportedPublicNames,
 )
 from lint_rules._stateful_computations.stateful_check import StatefulCheck
+from lint_rules._stateless_computations.check_entities_public_functions import (
+    check_entities_public_functions,
+)
 from lint_rules._stateless_computations.check_impure_imports import (
     check_impure_imports,
 )
@@ -36,6 +39,7 @@ _CHECKS: tuple[StatelessCheck, ...] = (
     check_public_classes,
     check_stateless_public_functions,
     check_stateless_public_classes,
+    check_entities_public_functions,
     check_single_method_classes,
     check_module_getattr,
     check_impure_imports,

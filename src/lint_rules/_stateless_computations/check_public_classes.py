@@ -5,12 +5,8 @@ from lint_rules._entities.violation_multiple_public_classes import (
 )
 from lint_rules._stateless_computations.ast_public_classes import ast_public_classes
 
-_MARKER = "# allow-multiple-public-classes"
-
 
 def check_public_classes(file: ParsedFile) -> list[Violation]:
-    if _MARKER in file.source:
-        return []
     classes = ast_public_classes(file.tree)
     if len(classes) <= 1:
         return []
