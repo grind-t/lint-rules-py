@@ -1,0 +1,98 @@
+from collections.abc import Iterable
+from textwrap import dedent
+from typing import Self
+
+import pytest
+
+from lint_rules._entities.parsed_file import ParsedFile
+from lint_rules._entities.source_file import SourceFile
+from lint_rules._entities.violation import Violation
+from lint_rules._stateful_computations.stateful_check import StatefulCheck
+from lint_rules._stateless_computations.parse_file import parse_file
+from lint_rules._stateless_computations.stateless_check import StatelessCheck
+
+
+class Project:
+    """Files under the root "src", one of them checked.
+
+    Modules and packages are named as in Python; nothing is created implicitly,
+    so a directory without ``.package(...)`` has no __init__.py.
+    """
+
+    def __init__(self) -> None:
+        self.files: dict[str, str] = {}
+        self.checked_path = ""
+
+    def package(self, name: str, source: str = "") -> Self:
+        return self.file(self._package_path(name), source)
+
+    def module(self, name: str, source: str = "") -> Self:
+        return self.file(self._module_path(name), source)
+
+    def file(self, path: str, source: str = "") -> Self:
+        self.files[f"src/{path}"] = dedent(source).lstrip("\n")
+        return self
+
+    def check_package(self, name: str, source: str) -> Self:
+        return self.check_file(self._package_path(name), source)
+
+    def check_module(self, name: str, source: str) -> Self:
+        return self.check_file(self._module_path(name), source)
+
+    def check_file(self, path: str, source: str) -> Self:
+        self.checked_path = f"src/{path}"
+        return self.file(path, source)
+
+    def to_files(self) -> list[ParsedFile]:
+        return [
+            parse_file(SourceFile("src", path, source))
+            for path, source in self.files.items()
+        ]
+
+    @staticmethod
+    def _package_path(name: str) -> str:
+        return name.replace(".", "/") + "/__init__.py"
+
+    @staticmethod
+    def _module_path(name: str) -> str:
+        return name.replace(".", "/") + ".py"
+
+
+def _check_files(
+    files: Iterable[ParsedFile], rule: StatelessCheck | StatefulCheck
+) -> list[Violation]:
+    """Run only this rule on the files."""
+    if isinstance(rule, StatefulCheck):
+        for file in files:
+            rule.visit(file)
+        return rule.finish()
+    return [violation for file in files for violation in rule(file)]
+
+
+def _check(project: Project, rule: StatelessCheck | StatefulCheck) -> list[Violation]:
+    """Violations of the checked file; other files only give context.
+
+    The order of violations is unspecified, so a case expects at most one.
+    """
+    assert project.checked_path, "the project has no checked file"
+    violations = _check_files(project.to_files(), rule)
+    return [v for v in violations if v.path == project.checked_path]
+
+
+def _case(
+    description: str, project: Project, *, expected: list[Violation]
+) -> tuple[str, Project, list[Violation]]:
+    return description, project, expected
+
+
+class FakeProject:
+    """What the tests of the imports rules need, as one fixture."""
+
+    project = Project
+    check = staticmethod(_check)
+    case = staticmethod(_case)
+
+
+@pytest.fixture
+def fake_project() -> FakeProject:
+    return FakeProject()

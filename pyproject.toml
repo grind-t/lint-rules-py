@@ -18,7 +18,7 @@ Homepage = "https://github.com/grind-t/lint-rules-py"
 Issues = "https://github.com/grind-t/lint-rules-py/issues"
 
 [project.scripts]
-lint-rules = "lint_rules._shell.cli:main"
+lint-rules = "lint_rules:main"
 
 [build-system]
 requires = ["uv_build>=0.12.9,<0.13.0"]
@@ -58,12 +58,10 @@ lint = [
     { cmd = "lint-rules src" },
 ]
 typecheck = "ty check"
-test-unit = "pytest tests/core"
-test-integration = "pytest tests/shell"
 test = "pytest"
 bench = "pytest benchmarks --codspeed"
 build = "uv build"
-check = ["lint", "typecheck", "test-unit"]
+check = ["lint", "typecheck", "test"]
 
 [dependency-groups]
 dev = [
@@ -81,9 +79,11 @@ root_package = "lint_rules"
 include_external_packages = true
 
 [[tool.importlinter.contracts]]
-name = "Shell depends on core, never the reverse"
+name = "Effects -> workflows -> computations -> entities"
 type = "layers"
 layers = [
-    "lint_rules._shell",
-    "lint_rules._core",
+    "lint_rules._stateless_effects : lint_rules._stateful_effects",
+    "lint_rules._stateless_workflows : lint_rules._stateful_workflows",
+    "lint_rules._stateless_computations : lint_rules._stateful_computations",
+    "lint_rules._entities",
 ]
