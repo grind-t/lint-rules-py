@@ -1,8 +1,8 @@
-from lint_rules._entities.non_empty_init_violation import NonEmptyInitViolation
 from lint_rules._entities.parsed_file import ParsedFile
 from lint_rules._entities.violation import Violation
-from lint_rules._stateless_computations.init_files import is_top_level_init
-from lint_rules._stateless_computations.package_init import is_package_init
+from lint_rules._entities.violation_non_empty_init import ViolationNonEmptyInit
+from lint_rules._stateless_computations.is_package_init import is_package_init
+from lint_rules._stateless_computations.is_top_level_init import is_top_level_init
 
 
 def check_non_empty_inits(file: ParsedFile) -> list[Violation]:
@@ -10,4 +10,4 @@ def check_non_empty_inits(file: ParsedFile) -> list[Violation]:
         return []
     if not file.tree.body:  # comments and blank lines are not in the body
         return []
-    return [NonEmptyInitViolation(file.path)]
+    return [ViolationNonEmptyInit(file.path)]

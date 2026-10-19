@@ -1,8 +1,8 @@
 import symtable
 
-from lint_rules._entities.module_getattr_violation import ModuleGetattrViolation
 from lint_rules._entities.parsed_file import ParsedFile
 from lint_rules._entities.violation import Violation
+from lint_rules._entities.violation_module_getattr import ViolationModuleGetattr
 
 _NAME = "__getattr__"
 
@@ -23,4 +23,4 @@ def _binds_module_getattr(table: symtable.SymbolTable) -> bool:
 def check_module_getattr(file: ParsedFile) -> list[Violation]:
     if not _binds_module_getattr(file.table):
         return []
-    return [ModuleGetattrViolation(file.path)]
+    return [ViolationModuleGetattr(file.path)]

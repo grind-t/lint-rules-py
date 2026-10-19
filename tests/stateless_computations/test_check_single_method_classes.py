@@ -1,9 +1,9 @@
-from lint_rules._entities.single_method_class_violation import (
-    SingleMethodClassViolation,
-)
 from lint_rules._entities.source_file import SourceFile
 from lint_rules._entities.source_location import SourceLocation
 from lint_rules._entities.violation import Violation
+from lint_rules._entities.violation_single_method_class import (
+    ViolationSingleMethodClass,
+)
 from lint_rules._stateless_computations.check_single_method_classes import (
     check_single_method_classes,
 )
@@ -16,7 +16,7 @@ def check(source: str) -> list[Violation]:
 
 def test_reports_class_with_single_method():
     assert check("x = 1\n\nclass A:\n    def run(self): ...") == [
-        SingleMethodClassViolation("a.py", SourceLocation(3, 1), cls="A", method="run")
+        ViolationSingleMethodClass("a.py", SourceLocation(3, 1), cls="A", method="run")
     ]
 
 

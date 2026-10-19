@@ -1,8 +1,8 @@
-from lint_rules._entities.multiple_public_classes_violation import (
-    MultiplePublicClassesViolation,
-)
 from lint_rules._entities.source_file import SourceFile
 from lint_rules._entities.violation import Violation
+from lint_rules._entities.violation_multiple_public_classes import (
+    ViolationMultiplePublicClasses,
+)
 from lint_rules._stateless_computations.check_public_classes import check_public_classes
 from lint_rules._stateless_computations.parse_file import parse_file
 
@@ -13,7 +13,7 @@ def check(source: str) -> list[Violation]:
 
 def test_reports_module_with_two_public_classes():
     assert check("class A: ...\nclass B: ...") == [
-        MultiplePublicClassesViolation("a.py", classes=("A", "B"))
+        ViolationMultiplePublicClasses("a.py", classes=("A", "B"))
     ]
 
 

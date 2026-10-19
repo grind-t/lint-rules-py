@@ -1,10 +1,10 @@
 from lint_rules._entities.parsed_file import ParsedFile
-from lint_rules._entities.single_method_class_violation import (
-    SingleMethodClassViolation,
-)
 from lint_rules._entities.violation import Violation
-from lint_rules._stateless_computations.single_method_classes import (
-    single_method_classes,
+from lint_rules._entities.violation_single_method_class import (
+    ViolationSingleMethodClass,
+)
+from lint_rules._stateless_computations.ast_single_method_classes import (
+    ast_single_method_classes,
 )
 
 _MARKER = "# allow-single-method-classes"
@@ -14,6 +14,6 @@ def check_single_method_classes(file: ParsedFile) -> list[Violation]:
     if _MARKER in file.source:
         return []
     return [
-        SingleMethodClassViolation(file.path, location, cls=cls, method=method)
-        for cls, method, location in single_method_classes(file.tree)
+        ViolationSingleMethodClass(file.path, location, cls=cls, method=method)
+        for cls, method, location in ast_single_method_classes(file.tree)
     ]

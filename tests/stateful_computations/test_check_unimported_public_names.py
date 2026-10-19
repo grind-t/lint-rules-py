@@ -1,6 +1,6 @@
 from lint_rules._entities.source_location import SourceLocation
-from lint_rules._entities.unimported_public_name_violation import (
-    UnimportedPublicNameViolation,
+from lint_rules._entities.violation_unimported_public_name import (
+    ViolationUnimportedPublicName,
 )
 from lint_rules._stateful_computations.check_unimported_public_names import (
     CheckUnimportedPublicNames,
@@ -42,7 +42,7 @@ def test_check_unimported_public_names(subtests, fake_project):
             "reports name used only in its module",
             fake_project.project().check_module("lib.a", "def run(): ...\nrun()"),
             expected=[
-                UnimportedPublicNameViolation(
+                ViolationUnimportedPublicName(
                     "src/lib/a.py", SourceLocation(1, 1), name="run"
                 )
             ],
@@ -53,7 +53,7 @@ def test_check_unimported_public_names(subtests, fake_project):
             .module("lib.b", "from lib.c import run")
             .check_module("lib.a", "def run(): ..."),
             expected=[
-                UnimportedPublicNameViolation(
+                ViolationUnimportedPublicName(
                     "src/lib/a.py", SourceLocation(1, 1), name="run"
                 )
             ],
@@ -62,7 +62,7 @@ def test_check_unimported_public_names(subtests, fake_project):
             "reports variable",
             fake_project.project().check_module("lib.a", "LIMIT = 1"),
             expected=[
-                UnimportedPublicNameViolation(
+                ViolationUnimportedPublicName(
                     "src/lib/a.py", SourceLocation(1, 1), name="LIMIT"
                 )
             ],

@@ -1,4 +1,4 @@
-from lint_rules._entities.module_getattr_violation import ModuleGetattrViolation
+from lint_rules._entities.violation_module_getattr import ViolationModuleGetattr
 from lint_rules._stateless_computations.check_module_getattr import check_module_getattr
 
 _BINDING_FORMS = [
@@ -24,7 +24,7 @@ def test_module_getattr(subtests, fake_project):
         fake_project.case(
             f"reports {source!r}",
             fake_project.project().check_module("app", source),
-            expected=[ModuleGetattrViolation("src/app.py")],
+            expected=[ViolationModuleGetattr("src/app.py")],
         )
         for source in _BINDING_FORMS
     ] + [

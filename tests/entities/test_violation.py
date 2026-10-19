@@ -5,15 +5,15 @@ from lint_rules._entities.violation import Violation
 
 
 @dataclass(frozen=True)
-class FakeViolation(Violation):
+class ViolationFake(Violation):
     @property
     def message(self) -> str:
         return "message"
 
 
 def test_str_without_location():
-    assert str(FakeViolation("a.py")) == "a.py: message"
+    assert str(ViolationFake("a.py")) == "a.py: message"
 
 
 def test_str_with_location():
-    assert str(FakeViolation("a.py", SourceLocation(3, 5))) == "a.py:3:5: message"
+    assert str(ViolationFake("a.py", SourceLocation(3, 5))) == "a.py:3:5: message"

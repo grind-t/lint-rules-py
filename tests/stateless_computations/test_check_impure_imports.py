@@ -1,5 +1,5 @@
-from lint_rules._entities.impure_import_violation import ImpureImportViolation
 from lint_rules._entities.source_location import SourceLocation
+from lint_rules._entities.violation_impure_import import ViolationImpureImport
 from lint_rules._stateless_computations.check_impure_imports import check_impure_imports
 
 
@@ -11,7 +11,7 @@ def test_impure_imports(subtests, fake_project):
                 "pkg/_stateless_computations/a.py", "from pathlib import Path"
             ),
             expected=[
-                ImpureImportViolation(
+                ViolationImpureImport(
                     "src/pkg/_stateless_computations/a.py",
                     SourceLocation(1, 21),
                     statement="from pathlib import Path",
@@ -24,7 +24,7 @@ def test_impure_imports(subtests, fake_project):
                 "pkg/_stateless_computations/a.py", "import subprocess"
             ),
             expected=[
-                ImpureImportViolation(
+                ViolationImpureImport(
                     "src/pkg/_stateless_computations/a.py",
                     SourceLocation(1, 8),
                     statement="import subprocess",
@@ -52,7 +52,7 @@ def test_impure_imports(subtests, fake_project):
                     f"pkg/{layer}/a.py", "import subprocess"
                 ),
                 expected=[
-                    ImpureImportViolation(
+                    ViolationImpureImport(
                         f"src/pkg/{layer}/a.py",
                         SourceLocation(1, 8),
                         statement="import subprocess",

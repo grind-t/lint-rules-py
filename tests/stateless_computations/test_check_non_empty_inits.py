@@ -1,4 +1,4 @@
-from lint_rules._entities.non_empty_init_violation import NonEmptyInitViolation
+from lint_rules._entities.violation_non_empty_init import ViolationNonEmptyInit
 from lint_rules._stateless_computations.check_non_empty_inits import (
     check_non_empty_inits,
 )
@@ -33,12 +33,12 @@ def test_non_empty_inits(subtests, fake_project):
             fake_project.project().check_package(
                 "lib.core", "from lib.core.app import run"
             ),
-            expected=[NonEmptyInitViolation("src/lib/core/__init__.py")],
+            expected=[ViolationNonEmptyInit("src/lib/core/__init__.py")],
         ),
         fake_project.case(
             "reports docstring in nested package",
             fake_project.project().check_package("lib.core", '"""Core."""'),
-            expected=[NonEmptyInitViolation("src/lib/core/__init__.py")],
+            expected=[ViolationNonEmptyInit("src/lib/core/__init__.py")],
         ),
         fake_project.case(
             "passes code in a module",

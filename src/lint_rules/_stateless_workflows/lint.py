@@ -2,11 +2,11 @@ from collections.abc import Callable, Iterable, Iterator
 
 from lint_rules._entities.source_file import SourceFile
 from lint_rules._entities.violation import Violation
-from lint_rules._stateful_computations.check_first_party_module_from_imports import (
-    CheckFirstPartyModuleFromImports,
+from lint_rules._stateful_computations.check_first_party_module_imports import (
+    CheckFirstPartyModuleImports,
 )
-from lint_rules._stateful_computations.check_plain_first_party_imports import (
-    CheckPlainFirstPartyImports,
+from lint_rules._stateful_computations.check_first_party_module_imports_from import (
+    CheckFirstPartyModuleImportsFrom,
 )
 from lint_rules._stateful_computations.check_unimported_public_names import (
     CheckUnimportedPublicNames,
@@ -35,8 +35,8 @@ _CHECKS: tuple[StatelessCheck, ...] = (
 )
 
 _STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (
-    CheckPlainFirstPartyImports,
-    CheckFirstPartyModuleFromImports,
+    CheckFirstPartyModuleImports,
+    CheckFirstPartyModuleImportsFrom,
     CheckUnimportedPublicNames,
 )
 
