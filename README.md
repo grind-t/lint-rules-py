@@ -14,6 +14,7 @@ lint-rules [root]   # default root: src; exit code 1 if there are violations
 | `check_stateless_public_functions` | In `_stateless_*` packages: more than one public top-level function per module |
 | `check_stateless_public_classes` | In `_stateless_*` packages: public top-level classes (`Protocol` ports are allowed) — use functions or move the class to `_entities` |
 | `check_entities_public_functions` | In `_entities`: public top-level functions — make them methods or move them to a computations package |
+| `check_stateful_public_functions` | In `_stateful_*` packages: public top-level functions — make them methods or move them to a stateless package |
 | `check_single_method_classes` | Classes with a single method — use a function, `Callable` alias or `Protocol` with `__call__` |
 | `check_module_getattr` | Module-level `__getattr__` |
 | `check_non_empty_inits` | Non-empty `__init__.py` in nested packages (re-exports) |
