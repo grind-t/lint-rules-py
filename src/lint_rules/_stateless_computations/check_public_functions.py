@@ -6,19 +6,14 @@ from lint_rules._entities.violation_multiple_public_functions import (
 from lint_rules._stateless_computations.ast_public_functions import (
     ast_public_functions,
 )
-
-_STATELESS_LAYERS = frozenset(
-    {
-        "_stateless_computations",
-        "_stateless_workflows",
-        "_stateless_effects",
-    }
+from lint_rules._stateless_computations.is_stateless_module import (
+    is_stateless_module,
 )
 
 
 def check_public_functions(file: ParsedFile) -> list[Violation]:
     """Stateless modules have at most one public function."""
-    if _STATELESS_LAYERS.isdisjoint(file.path.split("/")):
+    if not is_stateless_module(file.path):
         return []
     functions = ast_public_functions(file.tree)
     if len(functions) <= 1:
