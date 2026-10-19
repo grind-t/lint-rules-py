@@ -3,8 +3,8 @@ from lint_rules._entities.violation import Violation
 from lint_rules._entities.violation_multiple_public_functions import (
     ViolationMultiplePublicFunctions,
 )
-from lint_rules._stateless_computations.check_public_functions import (
-    check_public_functions,
+from lint_rules._stateless_computations.check_stateless_public_functions import (
+    check_stateless_public_functions,
 )
 from lint_rules._stateless_computations.parse_file import parse_file
 
@@ -17,7 +17,7 @@ _STATELESS_LAYERS = (
 
 
 def check(path: str, source: str) -> list[Violation]:
-    return check_public_functions(parse_file(SourceFile("src", path, source)))
+    return check_stateless_public_functions(parse_file(SourceFile("src", path, source)))
 
 
 def test_reports_stateless_module_with_two_public_functions(subtests):

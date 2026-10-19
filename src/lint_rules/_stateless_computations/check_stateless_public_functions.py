@@ -11,7 +11,7 @@ from lint_rules._stateless_computations.is_stateless_module import (
 )
 
 
-def check_public_functions(file: ParsedFile) -> list[Violation]:
+def check_stateless_public_functions(file: ParsedFile) -> list[Violation]:
     """Stateless modules have at most one public function."""
     if not is_stateless_module(file.path):
         return []

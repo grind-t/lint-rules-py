@@ -11,7 +11,7 @@ lint-rules [root]   # default root: src; exit code 1 if there are violations
 | Check | What it reports |
 |---|---|
 | `check_public_classes` | More than one public top-level class per module (exceptions and enums are exempt) |
-| `check_public_functions` | In `_stateless_*` packages: more than one public top-level function per module |
+| `check_stateless_public_functions` | In `_stateless_*` packages: more than one public top-level function per module |
 | `check_stateless_public_classes` | In `_stateless_*` packages: public top-level classes (`Protocol` ports are allowed) — use functions or move the class to `_entities` |
 | `check_single_method_classes` | Classes with a single method — use a function, `Callable` alias or `Protocol` with `__call__` |
 | `check_module_getattr` | Module-level `__getattr__` |
