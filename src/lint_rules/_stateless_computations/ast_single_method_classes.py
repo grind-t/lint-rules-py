@@ -5,8 +5,6 @@ from lint_rules._stateless_computations.ast_base_class_name import ast_base_clas
 from lint_rules._stateless_computations.ast_location import ast_location
 from lint_rules._stateless_computations.ast_statements import ast_statements
 
-_FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
-
 
 def _is_filler(stmt: ast.stmt) -> bool:
     """Docstrings, ``...`` and ``pass``: statements that add nothing to a class."""
@@ -24,7 +22,7 @@ def _single_method(cls: ast.ClassDef) -> str | None:
         return None
     methods: list[str] = []
     for stmt in cls.body:
-        if isinstance(stmt, _FUNCTION_TYPES):
+        if isinstance(stmt, ast.FunctionDef | ast.AsyncFunctionDef):
             methods.append(stmt.name)
         elif not _is_filler(stmt):
             return None
