@@ -12,6 +12,7 @@ def test_qualified_module_name(subtests):
         ("src/single.py", "src", "single"),
         ("lib/app.py", ".", "lib.app"),
         ("./lib/app.py", ".", "lib.app"),
+        ("src/lib/app.py", "./src", "lib.app"),
         ("src/__init__.py", "src", None),
         ("src/notes.txt", "src", None),
         ("srcx/app.py", "src", None),
