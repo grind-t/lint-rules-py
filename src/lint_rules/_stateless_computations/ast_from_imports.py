@@ -1,6 +1,7 @@
 import ast
 
 from lint_rules._entities.source_location import SourceLocation
+from lint_rules._stateless_computations.ast_location import ast_location
 from lint_rules._stateless_computations.ast_statements import ast_statements
 
 
@@ -11,7 +12,7 @@ def ast_from_imports(tree: ast.Module) -> list[tuple[str, str, SourceLocation]]:
     Relative imports, ``import *`` and plain ``import module`` are not included.
     """
     found = [
-        (node.module, alias.name, SourceLocation(alias.lineno, alias.col_offset + 1))
+        (node.module, alias.name, ast_location(alias))
         for node in ast_statements(tree)
         if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module
         for alias in node.names

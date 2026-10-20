@@ -2,6 +2,7 @@ import ast
 
 from lint_rules._entities.source_location import SourceLocation
 from lint_rules._stateless_computations.ast_base_class_name import ast_base_class_name
+from lint_rules._stateless_computations.ast_location import ast_location
 from lint_rules._stateless_computations.ast_statements import ast_statements
 
 _FUNCTION_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
@@ -45,7 +46,7 @@ def ast_single_method_classes(
     the recommended replacement and is not reported.
     """
     found = [
-        (node.name, method, SourceLocation(node.lineno, node.col_offset + 1))
+        (node.name, method, ast_location(node))
         for node in ast_statements(tree)
         if isinstance(node, ast.ClassDef) and (method := _single_method(node))
     ]

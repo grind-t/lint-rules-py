@@ -2,6 +2,7 @@ import ast
 
 from lint_rules._entities.source_location import SourceLocation
 from lint_rules._stateless_computations.ast_base_class_name import ast_base_class_name
+from lint_rules._stateless_computations.ast_location import ast_location
 
 # Enums and exceptions: subclasses stay the same kind, so they are exempt too.
 _INHERITED_BASES = {
@@ -41,5 +42,5 @@ def ast_public_classes(tree: ast.Module) -> list[tuple[str, SourceLocation]]:
         elif "Protocol" in bases:
             continue
         elif not node.name.startswith("_"):
-            found.append((node.name, SourceLocation(node.lineno, node.col_offset + 1)))
+            found.append((node.name, ast_location(node)))
     return found

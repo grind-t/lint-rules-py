@@ -1,6 +1,7 @@
 import ast
 
 from lint_rules._entities.source_location import SourceLocation
+from lint_rules._stateless_computations.ast_location import ast_location
 
 
 def _targets(node: ast.stmt) -> list[ast.expr]:
@@ -14,9 +15,9 @@ def _targets(node: ast.stmt) -> list[ast.expr]:
 
 def _defined(node: ast.stmt) -> list[tuple[str, SourceLocation]]:
     if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
-        return [(node.name, SourceLocation(node.lineno, node.col_offset + 1))]
+        return [(node.name, ast_location(node))]
     return [
-        (target.id, SourceLocation(target.lineno, target.col_offset + 1))
+        (target.id, ast_location(target))
         for target in _targets(node)
         if isinstance(target, ast.Name)
     ]
