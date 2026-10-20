@@ -13,6 +13,5 @@ class ViolationTooManyPublicClasses(Violation):
     def message(self) -> str:
         return (
             f"{len(self.classes)} public classes ({', '.join(self.classes)}) "
-            f"in {self.package}, at most {self.limit} allowed; "
-            "split them into modules or move them to another package"
+            f"in {self.package}, at most {self.limit} allowed"
         )

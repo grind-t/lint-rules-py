@@ -13,6 +13,5 @@ class ViolationTooManyPublicFunctions(Violation):
     def message(self) -> str:
         return (
             f"{len(self.functions)} public functions ({', '.join(self.functions)}) "
-            f"in {self.package}, at most {self.limit} allowed; "
-            "split them into modules, make them methods or move them"
+            f"in {self.package}, at most {self.limit} allowed"
         )
