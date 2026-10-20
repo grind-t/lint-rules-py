@@ -14,12 +14,12 @@ def lint_paths(files: dict[str, str], root: str = "src") -> list[str]:
 def test_runs_every_check_on_every_file():
     paths = lint_paths(
         {
-            "a.py": "class A: ...\nclass B: ...",
+            "_entities/a.py": "class A: ...\nclass B: ...",
             "b.py": "class C:\n    def run(self): ...",
             "c.py": "class D: ...",
         }
     )
-    assert paths == ["a.py", "b.py"]
+    assert paths == ["_entities/a.py", "b.py"]
 
 
 def test_runs_stateful_checks_across_files():

@@ -1,28 +1,45 @@
 import ast
 
+from lint_rules._entities.source_location import SourceLocation
 from lint_rules._stateless_computations.ast_base_class_name import ast_base_class_name
 
-_ENUM_BASES = {"Enum", "IntEnum", "StrEnum", "Flag", "IntFlag"}
+# Enums and exceptions: subclasses stay the same kind, so they are exempt too.
+_INHERITED_BASES = {
+    "Enum",
+    "IntEnum",
+    "StrEnum",
+    "Flag",
+    "IntFlag",
+    "ReprEnum",
+    "ExceptionGroup",
+    "BaseExceptionGroup",
+}
 _EXCEPTION_SUFFIXES = ("Error", "Exception", "Warning")
 
 
-def _is_exempt(cls: ast.ClassDef, exempt: set[str]) -> bool:
-    names = [ast_base_class_name(base) for base in cls.bases]
-    return any(
-        n in _ENUM_BASES or n in exempt or n.endswith(_EXCEPTION_SUFFIXES)
-        for n in names
+def _is_inherited_kind(name: str, exempt: set[str]) -> bool:
+    return (
+        name in _INHERITED_BASES or name in exempt or name.endswith(_EXCEPTION_SUFFIXES)
     )
 
 
-def ast_public_classes(tree: ast.Module) -> list[str]:
-    """Public top-level classes of a module, excluding exceptions and enums."""
+def ast_public_classes(tree: ast.Module) -> list[tuple[str, SourceLocation]]:
+    """``(name, location)`` of every public top-level class of a module.
+
+    Not counted: ``Protocol`` ports, enums and exceptions; they hold no data
+    or state. A subclass of a protocol without ``Protocol`` in its bases is an
+    implementation and is counted.
+    """
     exempt: set[str] = set()
-    found: list[str] = []
+    found: list[tuple[str, SourceLocation]] = []
     for node in tree.body:
         if not isinstance(node, ast.ClassDef):
             continue
-        if _is_exempt(node, exempt):
+        bases = [ast_base_class_name(base) for base in node.bases]
+        if any(_is_inherited_kind(base, exempt) for base in bases):
             exempt.add(node.name)
+        elif "Protocol" in bases:
+            continue
         elif not node.name.startswith("_"):
-            found.append(node.name)
+            found.append((node.name, SourceLocation(node.lineno, node.col_offset + 1)))
     return found

@@ -1,20 +1,39 @@
 import ast
 
+from lint_rules._entities.source_location import SourceLocation
 from lint_rules._stateless_computations.ast_public_classes import ast_public_classes
+
+
+def names(source: str) -> list[str]:
+    return [name for name, _ in ast_public_classes(ast.parse(source))]
 
 
 def test_public_classes(subtests):
     cases = [
         ("class A: ...\nclass B: ...", ["A", "B"]),
         ("class A: ...\nclass _B: ...", ["A"]),
-        ("class A: ...\nclass E(Exception): ...", ["A"]),
-        ("class A: ...\nclass E(LibError): ...", ["A"]),
-        ("class A: ...\nclass E(ValueError): ...\nclass F(E): ...", ["A"]),
-        ("from enum import Enum\nclass A: ...\nclass K(Enum): ...", ["A"]),
-        ("import enum\nclass A: ...\nclass K(enum.StrEnum): ...", ["A"]),
+        ("class E(Exception): ...", []),
+        ("class E(LibError): ...", []),
+        ("class E(ValueError): ...\nclass F(E): ...", []),
+        ("class K(Enum): ...", []),
+        ("class K(enum.StrEnum): ...", []),
+        ("class K(IntEnum): ...\nclass L(K): ...", []),
+        ("class P(Protocol): ...", []),
+        ("class P(typing.Protocol[T]): ...", []),
+        ("class P(Protocol): ...\nclass Impl(P): ...", ["Impl"]),
+        ("class G(ExceptionGroup): ...", []),
+        ("class D(TypedDict): ...", ["D"]),
+        ("class T(NamedTuple): ...", ["T"]),
+        ("class A(Generic[T]): ...", ["A"]),
         ("class A:\n    class Inner: ...", ["A"]),
         ("def f() -> None:\n    class Local: ...", []),
     ]
     for source, expected in cases:
         with subtests.test(repr(source)):
-            assert ast_public_classes(ast.parse(source)) == expected
+            assert names(source) == expected
+
+
+def test_locations():
+    assert ast_public_classes(ast.parse("x = 1\nclass A: ...")) == [
+        ("A", SourceLocation(2, 1))
+    ]

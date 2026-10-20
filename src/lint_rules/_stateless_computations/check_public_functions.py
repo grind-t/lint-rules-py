@@ -6,6 +6,7 @@ from lint_rules._entities.violation_too_many_public_functions import (
 from lint_rules._stateless_computations.ast_public_functions import (
     ast_public_functions,
 )
+from lint_rules._stateless_computations.layer_package import layer_package
 
 _MAX_PUBLIC_FUNCTIONS = {
     "_entities": 0,
@@ -20,10 +21,7 @@ _MAX_PUBLIC_FUNCTIONS = {
 
 def check_public_functions(file: ParsedFile) -> list[Violation]:
     """Modules of a layer package have at most its limit of public functions."""
-    package = next(
-        (part for part in file.path.split("/") if part in _MAX_PUBLIC_FUNCTIONS),
-        None,
-    )
+    package = layer_package(file.path)
     if package is None:
         return []
     limit = _MAX_PUBLIC_FUNCTIONS[package]
