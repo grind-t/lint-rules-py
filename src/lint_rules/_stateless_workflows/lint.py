@@ -5,9 +5,6 @@ from lint_rules._entities.violation import Violation
 from lint_rules._stateful_computations.check_first_party_module_imports import (
     CheckFirstPartyModuleImports,
 )
-from lint_rules._stateful_computations.check_first_party_module_imports_from import (
-    CheckFirstPartyModuleImportsFrom,
-)
 from lint_rules._stateful_computations.check_unimported_public_names import (
     CheckUnimportedPublicNames,
 )
@@ -38,7 +35,6 @@ _CHECKS: tuple[StatelessCheck, ...] = (
 
 _STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (
     CheckFirstPartyModuleImports,
-    CheckFirstPartyModuleImportsFrom,
     CheckUnimportedPublicNames,
 )
 
