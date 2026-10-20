@@ -11,10 +11,9 @@ def ast_imports(tree: ast.Module) -> list[tuple[str, SourceLocation]]:
     Each name of ``import a, b`` is its own entry, located at its alias.
     ``from module import name`` is not included.
     """
-    found = [
+    return [
         (alias.name, ast_location(alias))
         for node in ast_statements(tree)
         if isinstance(node, ast.Import)
         for alias in node.names
     ]
-    return sorted(found, key=lambda item: item[1])

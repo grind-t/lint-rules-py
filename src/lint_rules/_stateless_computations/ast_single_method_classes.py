@@ -45,9 +45,8 @@ def ast_single_method_classes(
     no class attributes. A ``Protocol`` whose only method is ``__call__`` is
     the recommended replacement and is not reported.
     """
-    found = [
+    return [
         (node.name, method, ast_location(node))
         for node in ast_statements(tree)
         if isinstance(node, ast.ClassDef) and (method := _single_method(node))
     ]
-    return sorted(found, key=lambda item: item[2])
