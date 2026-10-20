@@ -1,3 +1,5 @@
+from pathlib import PurePosixPath
+
 from lint_rules._entities.parsed_file import ParsedFile
 from lint_rules._entities.violation import Violation
 from lint_rules._entities.violation_module_name_mismatch import (
@@ -18,7 +20,7 @@ def check_module_names(file: ParsedFile) -> list[Violation]:
     ``ParsedFile``. Modules without public names and dunder modules such
     as ``__init__.py`` are skipped.
     """
-    stem = file.path.rpartition("/")[2].removesuffix(".py")
+    stem = PurePosixPath(file.path).stem
     if stem.startswith("__"):
         return []
     names = tuple(name for name, _ in ast_public_names(file.tree))

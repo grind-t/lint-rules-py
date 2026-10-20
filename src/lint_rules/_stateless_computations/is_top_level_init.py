@@ -1,4 +1,5 @@
-from pathlib import PurePosixPath
+from lint_rules._stateless_computations.is_package_init import is_package_init
+from lint_rules._stateless_computations.module_parts import module_parts
 
 
 def is_top_level_init(path: str, root: str) -> bool:
@@ -6,10 +7,5 @@ def is_top_level_init(path: str, root: str) -> bool:
 
     That is a directory directly under ``root``, or ``root`` itself.
     """
-    file = PurePosixPath(path)
-    if not file.is_relative_to(root):
-        return False
-    match file.relative_to(root).parts:
-        case [init] | [_, init]:
-            return init == "__init__.py"
-    return False
+    parts = module_parts(path, root)
+    return is_package_init(path) and parts is not None and len(parts) <= 1
