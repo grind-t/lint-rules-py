@@ -10,8 +10,7 @@ lint-rules [root]   # default root: src; exit code 1 if there are violations
 
 | Check | What it reports |
 |---|---|
-| `check_public_classes` | More public top-level classes per module than the package allows: `_entities` and `_stateful_*` — 1, `_stateless_*` — 0. `Protocol` ports, enums and exceptions are not counted |
-| `check_public_functions` | More public top-level functions per module than the package allows: `_entities` and `_stateful_*` — 0, `_stateless_*` — 1 |
+| `check_public_counts` | More public top-level classes or functions per module than the package allows: classes — 1 in `_entities` and `_stateful_*`, 0 in `_stateless_*`; functions — the other way round. `Protocol` ports, enums and exceptions are not counted as classes |
 | `check_single_method_classes` | Classes with a single method — use a function, `Callable` alias or `Protocol` with `__call__` |
 | `check_module_names` | Modules (except `__*__.py`) whose name matches none of their public top-level names, ignoring case and `_`: `parsed_file.py` matches `ParsedFile` |
 | `check_module_getattr` | Module-level `__getattr__` |

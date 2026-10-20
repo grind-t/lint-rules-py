@@ -4,14 +4,15 @@ from lint_rules._entities.violation import Violation
 
 
 @dataclass(frozen=True, kw_only=True)
-class ViolationTooManyPublicClasses(Violation):
+class ViolationTooManyPublicNames(Violation):
     package: str
     limit: int
-    classes: tuple[str, ...]
+    kind: str
+    names: tuple[str, ...]
 
     @property
     def message(self) -> str:
         return (
-            f"{len(self.classes)} public classes ({', '.join(self.classes)}) "
+            f"{len(self.names)} public {self.kind} ({', '.join(self.names)}) "
             f"in {self.package}, at most {self.limit} allowed"
         )

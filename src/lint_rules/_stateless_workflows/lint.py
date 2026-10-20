@@ -20,10 +20,7 @@ from lint_rules._stateless_computations.check_module_names import check_module_n
 from lint_rules._stateless_computations.check_non_empty_inits import (
     check_non_empty_inits,
 )
-from lint_rules._stateless_computations.check_public_classes import check_public_classes
-from lint_rules._stateless_computations.check_public_functions import (
-    check_public_functions,
-)
+from lint_rules._stateless_computations.check_public_counts import check_public_counts
 from lint_rules._stateless_computations.check_single_method_classes import (
     check_single_method_classes,
 )
@@ -31,8 +28,7 @@ from lint_rules._stateless_computations.parse_file import parse_file
 from lint_rules._stateless_computations.stateless_check import StatelessCheck
 
 _CHECKS: tuple[StatelessCheck, ...] = (
-    check_public_classes,
-    check_public_functions,
+    check_public_counts,
     check_single_method_classes,
     check_module_getattr,
     check_module_names,
