@@ -15,8 +15,8 @@ def test_runs_every_check_on_every_file():
     paths = lint_paths(
         {
             "_entities/a.py": "class A: ...\nclass B: ...",
-            "b.py": "class C:\n    def run(self): ...",
-            "c.py": "class D: ...",
+            "b.py": "class B:\n    def run(self): ...",
+            "c.py": "class C: ...",
         }
     )
     assert paths == ["_entities/a.py", "b.py"]

@@ -1,8 +1,8 @@
 import argparse
 
 from lint_rules._entities.violation import Violation
-from lint_rules._stateless_effects.fs_source_files import read_fs_source_files
-from lint_rules._stateless_effects.stderr import report_to_stderr
+from lint_rules._stateless_effects.read_fs_source_files import read_fs_source_files
+from lint_rules._stateless_effects.report_to_stderr import report_to_stderr
 from lint_rules._stateless_workflows.lint import lint
 
 

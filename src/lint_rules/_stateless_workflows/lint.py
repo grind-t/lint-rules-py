@@ -16,6 +16,7 @@ from lint_rules._stateless_computations.check_impure_imports import (
     check_impure_imports,
 )
 from lint_rules._stateless_computations.check_module_getattr import check_module_getattr
+from lint_rules._stateless_computations.check_module_names import check_module_names
 from lint_rules._stateless_computations.check_non_empty_inits import (
     check_non_empty_inits,
 )
@@ -34,6 +35,7 @@ _CHECKS: tuple[StatelessCheck, ...] = (
     check_public_functions,
     check_single_method_classes,
     check_module_getattr,
+    check_module_names,
     check_impure_imports,
     check_non_empty_inits,
 )

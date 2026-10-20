@@ -13,6 +13,7 @@ lint-rules [root]   # default root: src; exit code 1 if there are violations
 | `check_public_classes` | More public top-level classes per module than the package allows: `_entities` and `_stateful_*` — 1, `_stateless_*` — 0. `Protocol` ports, enums and exceptions are not counted |
 | `check_public_functions` | More public top-level functions per module than the package allows: `_entities` and `_stateful_*` — 0, `_stateless_*` — 1 |
 | `check_single_method_classes` | Classes with a single method — use a function, `Callable` alias or `Protocol` with `__call__` |
+| `check_module_names` | Modules (except `__*__.py`) whose name matches none of their public top-level names, ignoring case and `_`: `parsed_file.py` matches `ParsedFile` |
 | `check_module_getattr` | Module-level `__getattr__` |
 | `check_non_empty_inits` | Non-empty `__init__.py` in nested packages (re-exports) |
 | `check_impure_imports` | In `_entities`, `_*_computations` and `_*_workflows`: imports of I/O-capable names from `io`, `os`, `os.path`, `pathlib`, `socket`, `subprocess` (only pure names are allowed) |
