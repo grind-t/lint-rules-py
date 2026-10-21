@@ -1,6 +1,6 @@
 [project]
 name = "grind-t-lint-rules"
-version = "0.3.0"
+version = "0.4.0"
 description = "Custom lint rules for Python projects"
 license = "ISC"
 authors = [
