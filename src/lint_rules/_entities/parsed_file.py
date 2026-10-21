@@ -10,4 +10,4 @@ class ParsedFile(SourceFile):
     """A source file with its syntax tree and symbol table, built once per file."""
 
     tree: ast.Module
-    table: symtable.SymbolTable
+    symbol_table: symtable.SymbolTable

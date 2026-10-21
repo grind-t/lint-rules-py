@@ -6,4 +6,4 @@ class SourceLocation:
     """1-based line and column."""
 
     line: int
-    col: int
+    column: int

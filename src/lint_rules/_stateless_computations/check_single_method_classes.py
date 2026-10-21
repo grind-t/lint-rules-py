@@ -10,6 +10,8 @@ from lint_rules._stateless_computations.ast_single_method_classes import (
 
 def check_single_method_classes(file: ParsedFile) -> list[Violation]:
     return [
-        ViolationSingleMethodClass(file.path, location, cls=cls, method=method)
-        for cls, method, location in ast_single_method_classes(file.tree)
+        ViolationSingleMethodClass(
+            file.path, location, class_name=class_name, method_name=method_name
+        )
+        for class_name, method_name, location in ast_single_method_classes(file.tree)
     ]

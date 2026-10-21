@@ -22,4 +22,6 @@ class Violation(ABC):
     def __str__(self) -> str:
         if self.location is None:
             return f"{self.path}: {self.message}"
-        return f"{self.path}:{self.location.line}:{self.location.col}: {self.message}"
+        return (
+            f"{self.path}:{self.location.line}:{self.location.column}: {self.message}"
+        )

@@ -80,5 +80,5 @@ match x:
         class H:
             def run(self): ...
 """
-    classes = [cls for cls, _, _ in ast_single_method_classes(ast.parse(source))]
+    classes = [name for name, _, _ in ast_single_method_classes(ast.parse(source))]
     assert classes == ["A", "B", "C", "D", "F", "G", "H"]

@@ -11,10 +11,14 @@ from lint_rules._stateless_computations.parse_file import parse_file
 
 
 def check(source: str) -> list[Violation]:
-    return check_single_method_classes(parse_file(SourceFile("src", "a.py", source)))
+    return check_single_method_classes(
+        parse_file(SourceFile(root="src", path="a.py", source=source))
+    )
 
 
 def test_reports_class_with_single_method():
     assert check("x = 1\n\nclass A:\n    def run(self): ...") == [
-        ViolationSingleMethodClass("a.py", SourceLocation(3, 1), cls="A", method="run")
+        ViolationSingleMethodClass(
+            "a.py", SourceLocation(3, 1), class_name="A", method_name="run"
+        )
     ]

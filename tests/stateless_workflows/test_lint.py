@@ -5,7 +5,10 @@ from lint_rules._stateless_workflows.lint import lint
 def lint_paths(files: dict[str, str], root: str = "src") -> list[str]:
     violations = []
     lint(
-        [SourceFile(root, path, source) for path, source in files.items()],
+        [
+            SourceFile(root=root, path=path, source=source)
+            for path, source in files.items()
+        ],
         violations.append,
     )
     return [v.path for v in violations]

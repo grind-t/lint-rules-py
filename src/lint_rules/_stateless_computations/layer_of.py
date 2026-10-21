@@ -3,14 +3,48 @@ from lint_rules._entities.layer import Layer
 _LAYERS = {
     layer.name: layer
     for layer in (
-        # name, max public classes, max public functions, does I/O
-        Layer("_entities", 1, 0, False),
-        Layer("_stateless_computations", 0, 1, False),
-        Layer("_stateless_workflows", 0, 1, False),
-        Layer("_stateless_effects", 0, 1, True),
-        Layer("_stateful_computations", 1, 0, False),
-        Layer("_stateful_workflows", 1, 0, False),
-        Layer("_stateful_effects", 1, 0, True),
+        Layer(
+            name="_entities",
+            public_class_limit=1,
+            public_function_limit=0,
+            is_pure=True,
+        ),
+        Layer(
+            name="_stateless_computations",
+            public_class_limit=0,
+            public_function_limit=1,
+            is_pure=True,
+        ),
+        Layer(
+            name="_stateless_workflows",
+            public_class_limit=0,
+            public_function_limit=1,
+            is_pure=True,
+        ),
+        Layer(
+            name="_stateless_effects",
+            public_class_limit=0,
+            public_function_limit=1,
+            is_pure=False,
+        ),
+        Layer(
+            name="_stateful_computations",
+            public_class_limit=1,
+            public_function_limit=0,
+            is_pure=True,
+        ),
+        Layer(
+            name="_stateful_workflows",
+            public_class_limit=1,
+            public_function_limit=0,
+            is_pure=True,
+        ),
+        Layer(
+            name="_stateful_effects",
+            public_class_limit=1,
+            public_function_limit=0,
+            is_pure=False,
+        ),
     )
 }
 

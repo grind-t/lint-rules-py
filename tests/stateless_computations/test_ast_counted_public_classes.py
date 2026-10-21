@@ -1,11 +1,13 @@
 import ast
 
 from lint_rules._entities.source_location import SourceLocation
-from lint_rules._stateless_computations.ast_public_classes import ast_public_classes
+from lint_rules._stateless_computations.ast_counted_public_classes import (
+    ast_counted_public_classes,
+)
 
 
 def names(source: str) -> list[str]:
-    return [name for name, _ in ast_public_classes(ast.parse(source))]
+    return [name for name, _ in ast_counted_public_classes(ast.parse(source))]
 
 
 def test_public_classes(subtests):
@@ -34,6 +36,6 @@ def test_public_classes(subtests):
 
 
 def test_locations():
-    assert ast_public_classes(ast.parse("x = 1\nclass A: ...")) == [
+    assert ast_counted_public_classes(ast.parse("x = 1\nclass A: ...")) == [
         ("A", SourceLocation(2, 1))
     ]

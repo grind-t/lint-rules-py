@@ -11,5 +11,5 @@ def parse_file(file: SourceFile) -> ParsedFile:
     return ParsedFile(
         **asdict(file),
         tree=ast.parse(file.source),
-        table=symtable.symtable(file.source, file.path, "exec"),
+        symbol_table=symtable.symtable(file.source, file.path, compile_type="exec"),
     )

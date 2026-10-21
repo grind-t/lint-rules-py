@@ -14,17 +14,17 @@ from lint_rules._stateless_computations.qualified_module_name import (
 
 class CheckUnimportedPublicNames:
     def __init__(self) -> None:
-        self._imported: set[tuple[str, str]] = set()
-        self._defined: list[tuple[str, str, str, SourceLocation]] = []
+        self._imported_names: set[tuple[str, str]] = set()
+        self._public_names: list[tuple[str, str, str, SourceLocation]] = []
 
     def visit(self, file: ParsedFile) -> None:
-        self._imported.update(
+        self._imported_names.update(
             (module, name) for module, name, _ in ast_from_imports(file.tree)
         )
         module = qualified_module_name(file.path, file.root)
         if module is None or is_top_level_init(file.path, file.root):
             return
-        self._defined.extend(
+        self._public_names.extend(
             (file.path, module, name, location)
             for name, location in ast_public_names(file.tree)
         )
@@ -32,6 +32,6 @@ class CheckUnimportedPublicNames:
     def finish(self) -> list[Violation]:
         return [
             ViolationUnimportedPublicName(path, location, name=name)
-            for path, module, name, location in self._defined
-            if (module, name) not in self._imported
+            for path, module, name, location in self._public_names
+            if (module, name) not in self._imported_names
         ]

@@ -45,7 +45,7 @@ class Project:
 
     def to_files(self) -> list[ParsedFile]:
         return [
-            parse_file(SourceFile("src", path, source))
+            parse_file(SourceFile(root="src", path=path, source=source))
             for path, source in self.files.items()
         ]
 

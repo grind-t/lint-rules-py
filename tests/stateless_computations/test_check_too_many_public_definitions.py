@@ -1,13 +1,15 @@
 from lint_rules._entities.source_file import SourceFile
 from lint_rules._entities.source_location import SourceLocation
 from lint_rules._entities.violation import Violation
-from lint_rules._entities.violation_too_many_public_names import (
-    ViolationTooManyPublicNames,
+from lint_rules._entities.violation_too_many_public_definitions import (
+    ViolationTooManyPublicDefinitions,
 )
-from lint_rules._stateless_computations.check_public_counts import check_public_counts
+from lint_rules._stateless_computations.check_too_many_public_definitions import (
+    check_too_many_public_definitions,
+)
 from lint_rules._stateless_computations.parse_file import parse_file
 
-# (max classes, max functions) per package.
+# (class limit, function limit) per layer.
 _LIMITS = {
     "_entities": (1, 0),
     "_stateless_computations": (0, 1),
@@ -20,7 +22,9 @@ _LIMITS = {
 
 
 def check(path: str, source: str) -> list[Violation]:
-    return check_public_counts(parse_file(SourceFile("src", path, source)))
+    return check_too_many_public_definitions(
+        parse_file(SourceFile(root="src", path=path, source=source))
+    )
 
 
 def classes(count: int) -> str:
@@ -31,21 +35,21 @@ def functions(count: int) -> str:
     return "".join(f"def f{i}(): ...\n" for i in range(count))
 
 
-def test_reports_module_over_package_limit(subtests):
-    for package, (max_classes, max_functions) in _LIMITS.items():
-        path = f"src/pkg/{package}/a.py"
+def test_reports_module_over_layer_limit(subtests):
+    for layer, (class_limit, function_limit) in _LIMITS.items():
+        path = f"src/pkg/{layer}/a.py"
         kinds = [
-            ("classes", "C", max_classes, classes),
-            ("functions", "f", max_functions, functions),
+            ("classes", "C", class_limit, classes),
+            ("functions", "f", function_limit, functions),
         ]
         for kind, prefix, limit, define in kinds:
             names = tuple(f"{prefix}{i}" for i in range(limit + 1))
-            with subtests.test(f"{kind} in {package}"):
+            with subtests.test(f"{kind} in {layer}"):
                 assert check(path, define(limit + 1)) == [
-                    ViolationTooManyPublicNames(
+                    ViolationTooManyPublicDefinitions(
                         path,
                         SourceLocation(limit + 1, 1),
-                        package=package,
+                        layer=layer,
                         limit=limit,
                         kind=kind,
                         names=names,
@@ -53,28 +57,28 @@ def test_reports_module_over_package_limit(subtests):
                 ]
 
 
-def test_passes_module_at_package_limit(subtests):
-    for package, (max_classes, max_functions) in _LIMITS.items():
-        with subtests.test(package):
-            source = classes(max_classes) + functions(max_functions)
-            assert check(f"src/pkg/{package}/a.py", source) == []
+def test_passes_module_at_layer_limit(subtests):
+    for layer, (class_limit, function_limit) in _LIMITS.items():
+        with subtests.test(layer):
+            source = classes(class_limit) + functions(function_limit)
+            assert check(f"src/pkg/{layer}/a.py", source) == []
 
 
 def test_reports_both_kinds_over_limit():
     path = "src/pkg/_entities/a.py"
     assert check(path, classes(2) + "def f(): ...\n") == [
-        ViolationTooManyPublicNames(
+        ViolationTooManyPublicDefinitions(
             path,
             SourceLocation(2, 1),
-            package="_entities",
+            layer="_entities",
             limit=1,
             kind="classes",
             names=("C0", "C1"),
         ),
-        ViolationTooManyPublicNames(
+        ViolationTooManyPublicDefinitions(
             path,
             SourceLocation(3, 1),
-            package="_entities",
+            layer="_entities",
             limit=0,
             kind="functions",
             names=("f",),

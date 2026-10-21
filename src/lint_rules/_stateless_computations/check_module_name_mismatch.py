@@ -13,7 +13,7 @@ def _normalized(name: str) -> str:
     return name.replace("_", "").lower()
 
 
-def check_module_names(file: ParsedFile) -> list[Violation]:
+def check_module_name_mismatch(file: ParsedFile) -> list[Violation]:
     """The module is named after one of its public names.
 
     Case and underscores are ignored, so ``parsed_file.py`` matches
@@ -26,4 +26,4 @@ def check_module_names(file: ParsedFile) -> list[Violation]:
     names = tuple(name for name, _ in ast_public_names(file.tree))
     if not names or _normalized(stem) in {_normalized(name) for name in names}:
         return []
-    return [ViolationModuleNameMismatch(file.path, names=names)]
+    return [ViolationModuleNameMismatch(file.path, public_names=names)]

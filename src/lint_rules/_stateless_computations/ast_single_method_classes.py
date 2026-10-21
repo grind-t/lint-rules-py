@@ -13,15 +13,15 @@ def _is_filler(stmt: ast.stmt) -> bool:
     return isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant)
 
 
-def _single_method(cls: ast.ClassDef) -> str | None:
+def _single_method_name(node: ast.ClassDef) -> str | None:
     """Name of the only method of a stateless class."""
-    if cls.decorator_list or cls.keywords:
+    if node.decorator_list or node.keywords:
         return None
-    bases = {ast_base_class_name(base) for base in cls.bases} - {"object"}
+    bases = {ast_base_class_name(base) for base in node.bases} - {"object"}
     if bases - {"Protocol"}:
         return None
     methods: list[str] = []
-    for stmt in cls.body:
+    for stmt in node.body:
         if isinstance(stmt, ast.FunctionDef | ast.AsyncFunctionDef):
             methods.append(stmt.name)
         elif not _is_filler(stmt):
@@ -46,5 +46,5 @@ def ast_single_method_classes(
     return [
         (node.name, method, ast_location(node))
         for node in ast_statements(tree)
-        if isinstance(node, ast.ClassDef) and (method := _single_method(node))
+        if isinstance(node, ast.ClassDef) and (method := _single_method_name(node))
     ]

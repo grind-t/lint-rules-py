@@ -14,7 +14,7 @@ def test_impure_imports(subtests, fake_project):
                 ViolationImpureImport(
                     "src/pkg/_stateless_computations/a.py",
                     SourceLocation(1, 21),
-                    statement="from pathlib import Path",
+                    import_text="from pathlib import Path",
                 )
             ],
         ),
@@ -27,7 +27,7 @@ def test_impure_imports(subtests, fake_project):
                 ViolationImpureImport(
                     "src/pkg/_stateless_computations/a.py",
                     SourceLocation(1, 8),
-                    statement="import subprocess",
+                    import_text="import subprocess",
                 )
             ],
         ),
@@ -55,7 +55,7 @@ def test_impure_imports(subtests, fake_project):
                     ViolationImpureImport(
                         f"src/pkg/{layer}/a.py",
                         SourceLocation(1, 8),
-                        statement="import subprocess",
+                        import_text="import subprocess",
                     )
                 ],
             )

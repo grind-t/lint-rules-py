@@ -13,41 +13,45 @@ from lint_rules._stateless_computations.check_impure_imports import (
     check_impure_imports,
 )
 from lint_rules._stateless_computations.check_module_getattr import check_module_getattr
-from lint_rules._stateless_computations.check_module_names import check_module_names
+from lint_rules._stateless_computations.check_module_name_mismatch import (
+    check_module_name_mismatch,
+)
 from lint_rules._stateless_computations.check_non_empty_inits import (
     check_non_empty_inits,
 )
-from lint_rules._stateless_computations.check_public_counts import check_public_counts
 from lint_rules._stateless_computations.check_single_method_classes import (
     check_single_method_classes,
+)
+from lint_rules._stateless_computations.check_too_many_public_definitions import (
+    check_too_many_public_definitions,
 )
 from lint_rules._stateless_computations.parse_file import parse_file
 from lint_rules._stateless_computations.stateless_check import StatelessCheck
 
-_CHECKS: tuple[StatelessCheck, ...] = (
-    check_public_counts,
+_STATELESS_CHECKS: tuple[StatelessCheck, ...] = (
+    check_too_many_public_definitions,
     check_single_method_classes,
     check_module_getattr,
-    check_module_names,
+    check_module_name_mismatch,
     check_impure_imports,
     check_non_empty_inits,
 )
 
-_STATEFUL_CHECKS: tuple[Callable[[], StatefulCheck], ...] = (
+_STATEFUL_CHECK_TYPES: tuple[Callable[[], StatefulCheck], ...] = (
     CheckFirstPartyModuleImports,
     CheckUnimportedPublicNames,
 )
 
 
 def _violations(source_files: Iterable[SourceFile]) -> Iterator[Violation]:
-    stateful = [make() for make in _STATEFUL_CHECKS]
+    stateful_checks = [check_type() for check_type in _STATEFUL_CHECK_TYPES]
     for source_file in source_files:
         file = parse_file(source_file)
-        for check in _CHECKS:
+        for check in _STATELESS_CHECKS:
             yield from check(file)
-        for check in stateful:
+        for check in stateful_checks:
             check.visit(file)
-    for check in stateful:
+    for check in stateful_checks:
         yield from check.finish()
 
 

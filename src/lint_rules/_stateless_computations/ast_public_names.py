@@ -13,7 +13,7 @@ def _targets(node: ast.stmt) -> list[ast.expr]:
     return []
 
 
-def _defined(node: ast.stmt) -> list[tuple[str, SourceLocation]]:
+def _bound_names(node: ast.stmt) -> list[tuple[str, SourceLocation]]:
     if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
         return [(node.name, ast_location(node))]
     return [
@@ -31,6 +31,6 @@ def ast_public_names(tree: ast.Module) -> list[tuple[str, SourceLocation]]:
     return [
         (name, location)
         for node in tree.body
-        for name, location in _defined(node)
+        for name, location in _bound_names(node)
         if not name.startswith("_")
     ]

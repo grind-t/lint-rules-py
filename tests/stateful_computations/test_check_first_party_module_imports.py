@@ -74,7 +74,7 @@ def test_first_party_module_import_from(subtests, fake_project):
                     "src/lib/app.py",
                     SourceLocation(1, 23),
                     module="lib._core",
-                    name="greeting",
+                    submodule="greeting",
                 )
             ],
         ),
@@ -86,7 +86,7 @@ def test_first_party_module_import_from(subtests, fake_project):
                     "src/lib/app.py",
                     SourceLocation(1, 17),
                     module="lib",
-                    name="_core",
+                    submodule="_core",
                 )
             ],
         ),
@@ -98,7 +98,7 @@ def test_first_party_module_import_from(subtests, fake_project):
             .module("lib.z"),
             expected=[
                 ViolationFirstPartyModuleImportFrom(
-                    "src/lib/a.py", SourceLocation(1, 17), module="lib", name="z"
+                    "src/lib/a.py", SourceLocation(1, 17), module="lib", submodule="z"
                 )
             ],
         ),

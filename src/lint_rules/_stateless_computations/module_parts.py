@@ -8,8 +8,8 @@ def module_parts(path: str, root: str) -> tuple[str, ...] | None:
     ``__init__.py`` has no parts; non-``.py`` files and files outside the
     root define no module.
     """
-    file = PurePosixPath(path)
-    if file.suffix != ".py" or not file.is_relative_to(root):
+    file_path = PurePosixPath(path)
+    if file_path.suffix != ".py" or not file_path.is_relative_to(root):
         return None
-    parts = file.relative_to(root).with_suffix("").parts
+    parts = file_path.relative_to(root).with_suffix("").parts
     return parts[:-1] if parts[-1] == "__init__" else parts

@@ -5,9 +5,9 @@ from lint_rules._entities.source_location import SourceLocation
 from lint_rules._stateless_computations.ast_from_imports import ast_from_imports
 from lint_rules._stateless_computations.ast_imports import ast_imports
 
-# Modules that do I/O, each with the names that are safe to import from it.
-# A module that is absent here, or whose predicate is always false, has none.
-_PURE_NAMES: dict[str, Callable[[str], bool]] = {
+# Modules that do I/O, each with a test for the names that are safe to import
+# from it. Modules absent here do no I/O, so any of their names is safe.
+_IS_PURE_NAME_BY_IO_MODULE: dict[str, Callable[[str], bool]] = {
     "io": frozenset(
         {
             "BytesIO",
@@ -42,7 +42,7 @@ _PURE_NAMES: dict[str, Callable[[str], bool]] = {
 
 
 def ast_impure_imports(tree: ast.Module) -> list[tuple[str, SourceLocation]]:
-    """``(statement, location)`` of every import of a name that may do I/O.
+    """``(import_text, location)`` of every import of a name that may do I/O.
 
     Only ``from module import name`` can be told apart by name. A plain
     ``import module`` exposes everything in it, so it is always reported;
@@ -51,11 +51,12 @@ def ast_impure_imports(tree: ast.Module) -> list[tuple[str, SourceLocation]]:
     found = [
         (f"from {module} import {name}", location)
         for module, name, location in ast_from_imports(tree)
-        if module in _PURE_NAMES and not _PURE_NAMES[module](name)
+        if module in _IS_PURE_NAME_BY_IO_MODULE
+        and not _IS_PURE_NAME_BY_IO_MODULE[module](name)
     ]
     found.extend(
         (f"import {module}", location)
         for module, location in ast_imports(tree)
-        if module in _PURE_NAMES
+        if module in _IS_PURE_NAME_BY_IO_MODULE
     )
     return sorted(found, key=lambda item: item[1])
